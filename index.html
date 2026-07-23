@@ -320,6 +320,8 @@
 
     <div id="glimmerBanner"></div>
 
+    <p id="foundationsLink" style="display:none;font-size:13px;color:var(--accent);font-weight:600;cursor:pointer;margin:0 0 12px;text-align:center;">🌱 New here? Start with Foundations</p>
+
     <div class="card" style="text-align:center;">
       <h2>Before You Begin</h2>
       <div id="breathCircle"></div>
@@ -449,6 +451,20 @@
     <div id="moodCompanionGrid"></div>
   </section>
 
+  <!-- FOUNDATIONS VIEW -->
+  <section id="view-foundations" class="view">
+    <div class="card">
+      <h2>Foundations</h2>
+      <p style="font-size:13px;color:var(--muted);margin:0;">
+        A short, one-time introduction to mindful photography &mdash; five brief lessons,
+        at your own pace. Not part of your daily practice, just a gentle place to start
+        if this is new to you.
+      </p>
+    </div>
+    <div id="foundationsCurrent"></div>
+    <div id="foundationsList"></div>
+  </section>
+
 </main>
 
 <nav class="tabbar">
@@ -456,6 +472,7 @@
   <button data-view="gallery">🖼️ Journey</button>
   <button data-view="anchors">⚓ Anchors</button>
   <button data-view="moods">🎭 Moods</button>
+  <button data-view="foundations">🌱 Learn</button>
 </nav>
 
 <div class="modal-backdrop" id="modalBackdrop">
@@ -512,6 +529,71 @@ const STATE_COLORS = {
   dorsal:"#4a7ab5",
   ventral:"#3fa793"
 };
+
+/* ---------- Foundations: a one-time, self-paced introduction to mindful
+   photography for people who are new to this. Adapted and translated from
+   an existing course. Not part of the daily practice loop — a separate,
+   optional track people can work through at their own pace. ---------- */
+
+const FOUNDATIONS_LESSONS = [
+  {
+    title: "Before You Begin",
+    body: [
+      "Welcome. Over the next five short lessons, you'll learn to use a camera — any camera, even the one on your phone — as a tool for noticing, slowing down, and getting to know yourself a little better.",
+      "There's no right or wrong here. Each lesson has a short introduction and one simple exercise. Take your time — a few days between lessons is plenty, and there's no need to rush through them. Keep noticing in your everyday life between sessions; that's where most of the practice actually happens."
+    ],
+    exerciseLabel: "A short grounding moment before you start",
+    exercise: "Breathe in, breathe out. Let your breath move gently through your body — down through your legs, into your feet. A few more breaths there. Now up through your arms, into your hands, to your fingertips. A few more breaths there. Now notice what you can hear — what's close by, what's further away. And notice where your body touches something solid — the floor, a chair. Feel your weight resting there. Let yourself be here, fully, for a moment, before we begin."
+  },
+  {
+    title: "1. Why Mindfulness and Photography",
+    body: [
+      "We live in a loud, fast, over-scheduled world. Our minds naturally get used to what's familiar — which means we stop really seeing it. That habituation once protected us, so we could stay alert to real danger, but today it just means we miss most of what's actually in front of us.",
+      "A camera can work like an anchor, the same way the breath does in meditation. It gives your attention somewhere to land — on what's happening right now, not the to-do list or the worry loop. Practicing a ‘beginner's eye’ means looking at something as if for the first time: not naming it, not judging it, not filing it away — just looking, the way a child does before they've learned all the categories."
+    ],
+    exerciseLabel: "Exercise: The Frame",
+    exercise: "Make a small frame with your hands, or just use your phone's camera without taking the photo yet. Choose something ordinary nearby — a corner of a room, a plant, a patch of light. Look through the frame slowly. Notice colors, edges, shadows, textures you'd normally walk past. When something catches you, take the photo.",
+    optional: "Optional: a color hunt — spend a few minutes finding and photographing as many different colors as you can in one place."
+  },
+  {
+    title: "2. A Change of Perspective",
+    body: [
+      "The way we see the world is shaped by our culture, upbringing, and past experience — it's not a neutral view, even though it feels like one. Our minds sort things into quick categories so we can react fast; useful for survival, less useful for actually noticing what's in front of us.",
+      "“It's not about creating the sun, but about clearing the clouds so the sun can shine.” — Michael Wood"
+    ],
+    exerciseLabel: "Exercise: Changing the Angle",
+    exercise: "Pick one ordinary object — a cup, a shoe, a leaf. Photograph it from three very different angles or distances: very close up, from below, from an unusual side. Keep going until it starts to look unfamiliar, even strange. Notice what you saw only once you changed your position."
+  },
+  {
+    title: "3. Patterns in Nature",
+    body: [
+      "Nature is built from patterns within patterns — spirals, branches, waves, honeycombs, the same shapes repeating at different scales, all the way up to the sun. Research shows that simply looking at these natural fractal patterns can measurably lower physiological stress, sometimes in as little as ten seconds. Our nervous systems seem to settle around curved, organic shapes in a way they don't around the straight lines and hard edges of a city."
+    ],
+    exerciseLabel: "Exercise: Finding Patterns",
+    exercise: "Step outside if you can (a houseplant works too, if the weather doesn't cooperate). Slowly look for three different natural patterns — a spiral in a shell or fern, the branching of a tree, ripples on water, the repeating cells of a honeycomb. Photograph each one, taking your time with the light and texture.",
+    optional: "Optional meditation: find a patch of sky and watch the clouds for a few minutes. Notice how they're always changing, without any effort from you at all."
+  },
+  {
+    title: "4. Self-Portrait — Getting to Know Yourself",
+    body: [
+      "Before we can really love the world, we have to know and accept ourselves — corners, edges, and all. Self-knowledge isn't about being perfect or finished; it's an ongoing practice of paying attention to your own body, feelings, and thoughts, and treating them with the same care you'd offer someone you love."
+    ],
+    exerciseLabel: "Exercise: A Self-Portrait",
+    exercise: "Take a photo that represents you right now — it doesn't need to show your face. It could be your hands, your shadow, a reflection, or an object that says something true about where you are today. Afterward, sit with it for a moment: what does this photo show you about yourself right now?"
+  },
+  {
+    title: "5. Where to Go From Here — Rewriting Your Story",
+    body: [
+      "You've practiced seeing, shifting perspective, noticing patterns, and turning the camera on yourself. There's one last thing to do.",
+      "Go back through the photos you've taken during this track. Give each one a new title — but this time, write it in the first person, as something true about you, rather than a description of what's in the photo.",
+      "For example: a photo you'd titled “sparkling raindrops on a leaf” might become “I look forward to the sun after the rain.” A photo of “a typical autumn day with colorful leaves” might become “I welcome each season and let go along with it.”",
+      "Notice if you can find a relationship between yourself and what you photographed — whether these images have been talking about you all along."
+    ],
+    exerciseLabel: "Exercise: Rename Your Photos",
+    exercise: "Look back through what you've saved so far in this track. Rename each photo in the first person, as a small statement about yourself. Keep practicing after this — eventually, you won't need the camera at all to see this way.",
+    optional: "“It's not about creating the sun, but about clearing the clouds so the sun can shine.” You don't have to travel far — there's endless beauty and wonder available right where you are."
+  }
+];
 
 /* ---------- Deeper layer: moods & needs ---------- */
 
@@ -1356,6 +1438,87 @@ async function renderMoodsView(){
   });
 }
 
+/* ---------- Foundations progress ---------- */
+
+async function renderFoundationsView(){
+  const progress = (await getMeta("foundationsProgress")) || 0;
+  const currentBox = document.getElementById("foundationsCurrent");
+  const listBox = document.getElementById("foundationsList");
+  if(!currentBox || !listBox) return;
+
+  currentBox.innerHTML = "";
+  listBox.innerHTML = "";
+
+  if(progress < FOUNDATIONS_LESSONS.length){
+    const lesson = FOUNDATIONS_LESSONS[progress];
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML =
+      '<h2 style="font-size:16px;">' + lesson.title + '</h2>' +
+      lesson.body.map(p=>'<p style="font-size:14px;line-height:1.5;margin:0 0 10px;">' + p + '</p>').join("") +
+      (lesson.exercise
+        ? '<div style="background:#f4f1ea;border-radius:10px;padding:12px;margin:10px 0;">' +
+          '<p style="font-size:12px;font-weight:600;color:var(--accent);margin:0 0 6px;">' + lesson.exerciseLabel + '</p>' +
+          '<p style="font-size:14px;line-height:1.5;margin:0;">' + lesson.exercise + '</p></div>'
+        : '') +
+      (lesson.optional ? '<p style="font-size:12px;color:var(--muted);font-style:italic;margin:8px 0 0;">' + lesson.optional + '</p>' : '') +
+      '<button id="foundationsNextBtn" style="margin-top:14px;">' +
+        (progress === FOUNDATIONS_LESSONS.length - 1 ? "Finish Foundations" : "I&rsquo;ve done this &mdash; next lesson") +
+      '</button>';
+    currentBox.appendChild(card);
+    document.getElementById("foundationsNextBtn").addEventListener("click", async ()=>{
+      const next = progress + 1;
+      await setMeta("foundationsProgress", next);
+      renderFoundationsView();
+      updateFoundationsLink();
+      showToast(next >= FOUNDATIONS_LESSONS.length ? "Foundations complete 🌱" : "Nice work — see you at the next lesson.");
+    });
+  } else {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML =
+      '<h2 style="font-size:16px;">Foundations complete 🌱</h2>' +
+      '<p style="font-size:14px;color:var(--muted);margin:0;">You can revisit any lesson below any time.</p>';
+    currentBox.appendChild(card);
+  }
+
+  FOUNDATIONS_LESSONS.forEach((lesson, i)=>{
+    if(i === progress && progress < FOUNDATIONS_LESSONS.length) return;
+    const row = document.createElement("div");
+    row.className = "card";
+    if(i < progress){
+      row.style.cursor = "pointer";
+      row.innerHTML = '<h2 style="font-size:14px;margin:0;">✓ ' + lesson.title + '</h2>';
+      row.addEventListener("click", ()=>toggleFoundationsReview(row, lesson));
+    } else {
+      row.style.opacity = "0.45";
+      row.innerHTML = '<h2 style="font-size:14px;margin:0;">🔒 ' + lesson.title + '</h2>';
+    }
+    listBox.appendChild(row);
+  });
+}
+
+function toggleFoundationsReview(row, lesson){
+  const existing = row.querySelector(".reviewBody");
+  if(existing){ existing.remove(); return; }
+  const body = document.createElement("div");
+  body.className = "reviewBody";
+  body.style.marginTop = "10px";
+  body.innerHTML =
+    lesson.body.map(p=>'<p style="font-size:13px;line-height:1.5;margin:0 0 8px;color:var(--muted);">' + p + '</p>').join("") +
+    (lesson.exercise
+      ? '<p style="font-size:12px;font-weight:600;color:var(--accent);margin:8px 0 4px;">' + lesson.exerciseLabel + '</p>' +
+        '<p style="font-size:13px;line-height:1.5;margin:0;">' + lesson.exercise + '</p>'
+      : '');
+  row.appendChild(body);
+}
+
+async function updateFoundationsLink(){
+  const progress = (await getMeta("foundationsProgress")) || 0;
+  const link = document.getElementById("foundationsLink");
+  if(link) link.style.display = progress < FOUNDATIONS_LESSONS.length ? "block" : "none";
+}
+
 function getMeta(key){
   return new Promise((resolve)=>{
     const tx = db.transaction("meta","readonly");
@@ -1408,6 +1571,8 @@ async function init(){
   populateAnchorCategoryButtons();
   renderAnchors();
   renderMoodsView();
+  renderFoundationsView();
+  updateFoundationsLink();
 }
 
 /* ---------- Nervous system check-in ---------- */
@@ -1493,6 +1658,13 @@ function wireEvents(){
     document.querySelector('nav.tabbar button[data-view="anchors"]').classList.add("active");
     document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
     document.getElementById("view-anchors").classList.add("active");
+  });
+
+  document.getElementById("foundationsLink").addEventListener("click", ()=>{
+    document.querySelectorAll("nav.tabbar button").forEach(b=>b.classList.remove("active"));
+    document.querySelector('nav.tabbar button[data-view="foundations"]').classList.add("active");
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    document.getElementById("view-foundations").classList.add("active");
   });
 
   document.getElementById("anchorPhotoInput").addEventListener("change", (e)=>{
