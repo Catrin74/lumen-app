@@ -1541,8 +1541,7 @@ function toggleFoundationsReview(row, lesson){
       : '') +
     (lesson.audio
       ? '<audio class="reviewAudio" controls style="width:100%;margin-top:8px;display:none;"><source src="' + lesson.audio + '" type="audio/mpeg" /></audio>'
-      : '') +
-    (lesson.photoExercise ? '<div class="reviewPhotoList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>' : '');
+      : '');
   row.appendChild(body);
   if(lesson.audio){
     const reviewAudioEl = body.querySelector(".reviewAudio");
@@ -1551,8 +1550,10 @@ function toggleFoundationsReview(row, lesson){
     }
   }
   if(lesson.photoExercise){
+    // Reuse the same capture UI as the active-lesson view, so a finished
+    // lesson can still have photos added to it, not just viewed.
     const lessonIndex = FOUNDATIONS_LESSONS.indexOf(lesson);
-    renderFoundationsSavedList(lessonIndex, body.querySelector(".reviewPhotoList"));
+    renderFoundationsPhotoCapture(lessonIndex, body);
   }
 }
 
