@@ -543,7 +543,8 @@ const FOUNDATIONS_LESSONS = [
       "There's no right or wrong here. Each lesson has a short introduction and one simple exercise. Take your time — a few days between lessons is plenty, and there's no need to rush through them. Keep noticing in your everyday life between sessions; that's where most of the practice actually happens."
     ],
     exerciseLabel: "A short grounding moment before you start",
-    exercise: "Breathe in, breathe out. Let your breath move gently through your body — down through your legs, into your feet. A few more breaths there. Now up through your arms, into your hands, to your fingertips. A few more breaths there. Now notice what you can hear — what's close by, what's further away. And notice where your body touches something solid — the floor, a chair. Feel your weight resting there. Let yourself be here, fully, for a moment, before we begin."
+    exercise: "Breathe in, breathe out. Let your breath move gently through your body — down through your legs, into your feet. A few more breaths there. Now up through your arms, into your hands, to your fingertips. A few more breaths there. Now notice what you can hear — what's close by, what's further away. And notice where your body touches something solid — the floor, a chair. Feel your weight resting there. Let yourself be here, fully, for a moment, before we begin.",
+    audio: "audio/before-you-begin.mp3"
   },
   {
     title: "1. Why Mindfulness and Photography",
@@ -553,7 +554,8 @@ const FOUNDATIONS_LESSONS = [
     ],
     exerciseLabel: "Exercise: The Frame",
     exercise: "Make a small frame with your hands, or just use your phone's camera without taking the photo yet. Choose something ordinary nearby — a corner of a room, a plant, a patch of light. Look through the frame slowly. Notice colors, edges, shadows, textures you'd normally walk past. When something catches you, take the photo.",
-    optional: "Optional: a color hunt — spend a few minutes finding and photographing as many different colors as you can in one place."
+    optional: "Optional: a color hunt — spend a few minutes finding and photographing as many different colors as you can in one place.",
+    photoExercise: true
   },
   {
     title: "2. A Change of Perspective",
@@ -562,7 +564,8 @@ const FOUNDATIONS_LESSONS = [
       "“It's not about creating the sun, but about clearing the clouds so the sun can shine.” — Michael Wood"
     ],
     exerciseLabel: "Exercise: Changing the Angle",
-    exercise: "Pick one ordinary object — a cup, a shoe, a leaf. Photograph it from three very different angles or distances: very close up, from below, from an unusual side. Keep going until it starts to look unfamiliar, even strange. Notice what you saw only once you changed your position."
+    exercise: "Pick one ordinary object — a cup, a shoe, a leaf. Photograph it from three very different angles or distances: very close up, from below, from an unusual side. Keep going until it starts to look unfamiliar, even strange. Notice what you saw only once you changed your position.",
+    photoExercise: true
   },
   {
     title: "3. Patterns in Nature",
@@ -571,7 +574,8 @@ const FOUNDATIONS_LESSONS = [
     ],
     exerciseLabel: "Exercise: Finding Patterns",
     exercise: "Step outside if you can (a houseplant works too, if the weather doesn't cooperate). Slowly look for three different natural patterns — a spiral in a shell or fern, the branching of a tree, ripples on water, the repeating cells of a honeycomb. Photograph each one, taking your time with the light and texture.",
-    optional: "Optional meditation: find a patch of sky and watch the clouds for a few minutes. Notice how they're always changing, without any effort from you at all."
+    optional: "Optional meditation: find a patch of sky and watch the clouds for a few minutes. Notice how they're always changing, without any effort from you at all.",
+    photoExercise: true
   },
   {
     title: "4. Self-Portrait — Getting to Know Yourself",
@@ -579,7 +583,8 @@ const FOUNDATIONS_LESSONS = [
       "Before we can really love the world, we have to know and accept ourselves — corners, edges, and all. Self-knowledge isn't about being perfect or finished; it's an ongoing practice of paying attention to your own body, feelings, and thoughts, and treating them with the same care you'd offer someone you love."
     ],
     exerciseLabel: "Exercise: A Self-Portrait",
-    exercise: "Take a photo that represents you right now — it doesn't need to show your face. It could be your hands, your shadow, a reflection, or an object that says something true about where you are today. Afterward, sit with it for a moment: what does this photo show you about yourself right now?"
+    exercise: "Take a photo that represents you right now — it doesn't need to show your face. It could be your hands, your shadow, a reflection, or an object that says something true about where you are today. Afterward, sit with it for a moment: what does this photo show you about yourself right now?",
+    photoExercise: true
   },
   {
     title: "5. Where to Go From Here — Rewriting Your Story",
@@ -591,7 +596,8 @@ const FOUNDATIONS_LESSONS = [
     ],
     exerciseLabel: "Exercise: Rename Your Photos",
     exercise: "Look back through what you've saved so far in this track. Rename each photo in the first person, as a small statement about yourself. Keep practicing after this — eventually, you won't need the camera at all to see this way.",
-    optional: "“It's not about creating the sun, but about clearing the clouds so the sun can shine.” You don't have to travel far — there's endless beauty and wonder available right where you are."
+    optional: "“It's not about creating the sun, but about clearing the clouds so the sun can shine.” You don't have to travel far — there's endless beauty and wonder available right where you are.",
+    renameGallery: true
   }
 ];
 
@@ -1198,7 +1204,7 @@ function selectNeed(need, container, btn){
 /* ---------- IndexedDB ---------- */
 
 const DB_NAME = "lumen-journal";
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 let db;
 
 function openDB(){
@@ -1219,6 +1225,10 @@ function openDB(){
       }
       if(!database.objectStoreNames.contains("moodCompanions")){
         database.createObjectStore("moodCompanions",{keyPath:"mood"});
+      }
+      if(!database.objectStoreNames.contains("foundationsPhotos")){
+        const fpStore = database.createObjectStore("foundationsPhotos",{keyPath:"id", autoIncrement:true});
+        fpStore.createIndex("lessonIndex","lessonIndex");
       }
     };
     req.onsuccess = (e)=>{ db = e.target.result; resolve(db); };
@@ -1459,13 +1469,32 @@ async function renderFoundationsView(){
       (lesson.exercise
         ? '<div style="background:#f4f1ea;border-radius:10px;padding:12px;margin:10px 0;">' +
           '<p style="font-size:12px;font-weight:600;color:var(--accent);margin:0 0 6px;">' + lesson.exerciseLabel + '</p>' +
-          '<p style="font-size:14px;line-height:1.5;margin:0;">' + lesson.exercise + '</p></div>'
+          '<p style="font-size:14px;line-height:1.5;margin:0;">' + lesson.exercise + '</p>' +
+          (lesson.audio
+            ? '<audio id="foundationsAudio" controls style="width:100%;margin-top:10px;display:none;">' +
+              '<source src="' + lesson.audio + '" type="audio/mpeg" /></audio>'
+            : '') +
+          '</div>'
         : '') +
       (lesson.optional ? '<p style="font-size:12px;color:var(--muted);font-style:italic;margin:8px 0 0;">' + lesson.optional + '</p>' : '') +
       '<button id="foundationsNextBtn" style="margin-top:14px;">' +
         (progress === FOUNDATIONS_LESSONS.length - 1 ? "Finish Foundations" : "I&rsquo;ve done this &mdash; next lesson") +
       '</button>';
     currentBox.appendChild(card);
+    if(lesson.audio){
+      const audioEl = document.getElementById("foundationsAudio");
+      if(audioEl){
+        // Only reveal the player once the file actually loads — keeps things
+        // clean until a real recording is dropped into audio/.
+        audioEl.addEventListener("loadedmetadata", ()=>{ audioEl.style.display = "block"; });
+      }
+    }
+    if(lesson.photoExercise){
+      renderFoundationsPhotoCapture(progress, currentBox);
+    }
+    if(lesson.renameGallery){
+      renderFoundationsRenameGallery(currentBox);
+    }
     document.getElementById("foundationsNextBtn").addEventListener("click", async ()=>{
       const next = progress + 1;
       await setMeta("foundationsProgress", next);
@@ -1509,14 +1538,188 @@ function toggleFoundationsReview(row, lesson){
     (lesson.exercise
       ? '<p style="font-size:12px;font-weight:600;color:var(--accent);margin:8px 0 4px;">' + lesson.exerciseLabel + '</p>' +
         '<p style="font-size:13px;line-height:1.5;margin:0;">' + lesson.exercise + '</p>'
-      : '');
+      : '') +
+    (lesson.audio
+      ? '<audio class="reviewAudio" controls style="width:100%;margin-top:8px;display:none;"><source src="' + lesson.audio + '" type="audio/mpeg" /></audio>'
+      : '') +
+    (lesson.photoExercise ? '<div class="reviewPhotoList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>' : '');
   row.appendChild(body);
+  if(lesson.audio){
+    const reviewAudioEl = body.querySelector(".reviewAudio");
+    if(reviewAudioEl){
+      reviewAudioEl.addEventListener("loadedmetadata", ()=>{ reviewAudioEl.style.display = "block"; });
+    }
+  }
+  if(lesson.photoExercise){
+    const lessonIndex = FOUNDATIONS_LESSONS.indexOf(lesson);
+    renderFoundationsSavedList(lessonIndex, body.querySelector(".reviewPhotoList"));
+  }
 }
 
 async function updateFoundationsLink(){
   const progress = (await getMeta("foundationsProgress")) || 0;
   const link = document.getElementById("foundationsLink");
   if(link) link.style.display = progress < FOUNDATIONS_LESSONS.length ? "block" : "none";
+}
+
+/* ---------- Foundations photos: the pictures taken during each track
+   exercise, saved per lesson so they're available later for Lesson 5's
+   "rename in first person" exercise. ---------- */
+
+function addFoundationsPhoto(entry){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction("foundationsPhotos","readwrite");
+    tx.objectStore("foundationsPhotos").add(entry);
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = (e)=>reject(e);
+  });
+}
+
+function getFoundationsPhotosByLesson(lessonIndex){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction("foundationsPhotos","readonly");
+    const req = tx.objectStore("foundationsPhotos").getAll();
+    req.onsuccess = ()=>resolve(req.result.filter(p=>p.lessonIndex===lessonIndex).sort((a,b)=>a.timestamp-b.timestamp));
+    req.onerror = (e)=>reject(e);
+  });
+}
+
+function getAllFoundationsPhotos(){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction("foundationsPhotos","readonly");
+    const req = tx.objectStore("foundationsPhotos").getAll();
+    req.onsuccess = ()=>resolve(req.result.sort((a,b)=>a.timestamp-b.timestamp));
+    req.onerror = (e)=>reject(e);
+  });
+}
+
+function updateFoundationsPhotoTitle(id, title){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction("foundationsPhotos","readwrite");
+    const store = tx.objectStore("foundationsPhotos");
+    const getReq = store.get(id);
+    getReq.onsuccess = ()=>{
+      const rec = getReq.result;
+      if(rec){ rec.title = title; store.put(rec); }
+    };
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = (e)=>reject(e);
+  });
+}
+
+function deleteFoundationsPhoto(id){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction("foundationsPhotos","readwrite");
+    tx.objectStore("foundationsPhotos").delete(id);
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = (e)=>reject(e);
+  });
+}
+
+async function renderFoundationsSavedList(lessonIndex, listEl){
+  const photos = await getFoundationsPhotosByLesson(lessonIndex);
+  listEl.innerHTML = "";
+  photos.forEach(p=>{
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "position:relative;";
+    wrap.innerHTML =
+      '<img src="' + p.photo + '" style="width:70px;height:70px;object-fit:cover;border-radius:8px;display:block;" />' +
+      '<button data-photo-id="' + p.id + '" class="fpDeleteBtn" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:none;background:#a83246;color:#fff;font-size:12px;line-height:1;cursor:pointer;">×</button>';
+    listEl.appendChild(wrap);
+  });
+  listEl.querySelectorAll(".fpDeleteBtn").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      await deleteFoundationsPhoto(Number(btn.dataset.photoId));
+      renderFoundationsSavedList(lessonIndex, listEl);
+    });
+  });
+}
+
+async function renderFoundationsPhotoCapture(lessonIndex, container){
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML =
+    '<h2 style="font-size:14px;">Save a photo from this exercise</h2>' +
+    '<img id="fpPreview" class="capture-preview" alt="preview" />' +
+    '<div class="btn-row">' +
+      '<label class="btn primary" style="text-align:center;">📷 Take / Upload Photo' +
+        '<input type="file" accept="image/*" id="fpInput" style="display:none;" />' +
+      '</label>' +
+    '</div>' +
+    '<textarea id="fpCaption" placeholder="A word or two about this photo (optional)"></textarea>' +
+    '<button id="fpSaveBtn">Save Photo</button>' +
+    '<div id="fpSavedList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>';
+  container.appendChild(card);
+
+  const preview = card.querySelector("#fpPreview");
+  card.querySelector("#fpInput").addEventListener("change", (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      preview.src = ev.target.result;
+      preview.style.display = "block";
+      preview.dataset.dataurl = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  card.querySelector("#fpSaveBtn").addEventListener("click", async ()=>{
+    if(!preview.dataset.dataurl){ showToast("Add a photo first."); return; }
+    const caption = card.querySelector("#fpCaption").value.trim();
+    await addFoundationsPhoto({ lessonIndex, photo: preview.dataset.dataurl, title: caption, timestamp: Date.now() });
+    preview.style.display = "none";
+    preview.removeAttribute("src");
+    delete preview.dataset.dataurl;
+    card.querySelector("#fpCaption").value = "";
+    renderFoundationsSavedList(lessonIndex, card.querySelector("#fpSavedList"));
+    showToast("Photo saved.");
+  });
+
+  renderFoundationsSavedList(lessonIndex, card.querySelector("#fpSavedList"));
+}
+
+async function renderFoundationsRenameGallery(container){
+  const photos = await getAllFoundationsPhotos();
+  const card = document.createElement("div");
+  card.className = "card";
+
+  if(photos.length === 0){
+    card.innerHTML =
+      '<h2 style="font-size:14px;">Your photos so far</h2>' +
+      '<p style="font-size:13px;color:var(--muted);margin:0;">You haven&rsquo;t saved any photos from the earlier lessons yet — go back and add some, then come back here to rename them.</p>';
+    container.appendChild(card);
+    return;
+  }
+
+  card.innerHTML = '<h2 style="font-size:14px;">Your photos so far &mdash; give each one a new, first-person title</h2>';
+  photos.forEach(p=>{
+    const row = document.createElement("div");
+    row.style.cssText = "display:flex;gap:10px;align-items:flex-start;margin-top:12px;";
+    row.innerHTML =
+      '<img src="' + p.photo + '" style="width:64px;height:64px;object-fit:cover;border-radius:8px;flex-shrink:0;" />' +
+      '<div style="flex:1;">' +
+        (p.title ? '<p style="font-size:11px;color:var(--muted);margin:0 0 4px;">Was: ' + p.title + '</p>' : '') +
+        '<input type="text" class="fpRenameInput" data-photo-id="' + p.id + '" placeholder="e.g. I look forward to the sun after the rain" value="' + (p.newTitle || "") + '" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;box-sizing:border-box;" />' +
+      '</div>';
+    card.appendChild(row);
+  });
+
+  container.appendChild(card);
+
+  card.querySelectorAll(".fpRenameInput").forEach(input=>{
+    input.addEventListener("change", async ()=>{
+      const id = Number(input.dataset.photoId);
+      const tx = db.transaction("foundationsPhotos","readwrite");
+      const store = tx.objectStore("foundationsPhotos");
+      const getReq = store.get(id);
+      getReq.onsuccess = ()=>{
+        const rec = getReq.result;
+        if(rec){ rec.newTitle = input.value; store.put(rec); }
+      };
+      showToast("Saved.");
+    });
+  });
 }
 
 function getMeta(key){
