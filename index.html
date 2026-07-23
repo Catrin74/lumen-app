@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Lumen &mdash; Mindful Photography Journal (working title)</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#2a2a3b" />
+<style>
+  :root{
+    --bg:#f6f3ee;
+    --card:#ffffff;
+    --ink:#2a2a3b;
+    --muted:#7a7a86;
+    --accent:#6b5b95;
+    --sympathetic:#e0584f;
+    --dorsal:#4a7ab5;
+    --ventral:#3fa793;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding-bottom:70px;
+  }
+  header{
+    padding:24px 20px 12px;
+  }
+  header h1{
+    font-size:22px;
+    margin:0 0 2px;
+    font-weight:600;
+  }
+  header p{
+    margin:0;
+    color:var(--muted);
+    font-size:14px;
+  }
+  main{
+    padding:0 16px;
+    max-width:520px;
+    margin:0 auto;
+  }
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:18px;
+    margin-bottom:16px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.06);
+  }
+  .card h2{
+    font-size:15px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--muted);
+    margin:0 0 10px;
+  }
+  .prompt-text{
+    font-size:18px;
+    line-height:1.4;
+    margin:0;
+  }
+  .streak{
+    font-size:13px;
+    color:var(--muted);
+    margin-top:8px;
+  }
+  .ns-buttons{
+    display:flex;
+    gap:10px;
+  }
+  .ns-btn{
+    flex:1;
+    border:none;
+    border-radius:12px;
+    padding:14px 6px;
+    color:white;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    opacity:0.85;
+    transition:opacity .15s, transform .1s;
+  }
+  .ns-btn:active{transform:scale(0.97);}
+  .ns-btn.selected{opacity:1;box-shadow:0 0 0 3px rgba(0,0,0,0.15) inset;}
+  .ns-btn.sympathetic{background:var(--sympathetic);}
+  .ns-btn.dorsal{background:var(--dorsal);}
+  .ns-btn.ventral{background:var(--ventral);}
+  .ns-hint{
+    margin-top:10px;
+    font-size:13px;
+    color:var(--muted);
+    min-height:18px;
+  }
+  .capture-preview{
+    width:100%;
+    border-radius:12px;
+    margin-top:10px;
+    display:none;
+    max-height:320px;
+    object-fit:cover;
+  }
+  .btn-row{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+  }
+  .btn{
+    flex:1;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid #ddd8cf;
+    background:#fff;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    color:var(--ink);
+  }
+  .btn.primary{
+    background:var(--accent);
+    color:white;
+    border:none;
+  }
+  textarea{
+    width:100%;
+    margin-top:10px;
+    border-radius:12px;
+    border:1px solid #ddd8cf;
+    padding:12px;
+    font-family:inherit;
+    font-size:14px;
+    resize:vertical;
+    min-height:60px;
+  }
+  .glimmer-toggle{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:10px;
+    font-size:13px;
+    color:var(--muted);
+  }
+  #saveBtn{
+    width:100%;
+    margin-top:14px;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:var(--accent);
+    color:white;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  #glimmerBanner{
+    display:none;
+    background:linear-gradient(135deg,#f4d9c6,#f0c9d9);
+    border-radius:12px;
+    padding:16px;
+    font-size:15px;
+    font-style:italic;
+    text-align:center;
+    margin-bottom:16px;
+  }
+  .gallery-filters{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    margin-bottom:10px;
+  }
+  .filter-chip{
+    flex:none;
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid #ddd8cf;
+    background:#fff;
+    font-size:12px;
+    cursor:pointer;
+    color:var(--muted);
+  }
+  .filter-chip.active{
+    background:var(--ink);
+    color:#fff;
+    border-color:var(--ink);
+  }
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+  }
+  .gallery-item{
+    position:relative;
+    aspect-ratio:1/1;
+    border-radius:10px;
+    overflow:hidden;
+    cursor:pointer;
+  }
+  .gallery-item img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .gallery-item .dot{
+    position:absolute;
+    top:5px;
+    right:5px;
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    box-shadow:0 0 0 1.5px rgba(255,255,255,0.8);
+  }
+  @keyframes breathe{
+    0%{transform:scale(1);}
+    40%{transform:scale(1.3);}
+    100%{transform:scale(1);}
+  }
+  #breathCircle{
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    background:radial-gradient(circle, var(--accent), #a89bd1);
+    margin:14px auto;
+    animation:breathe 10s ease-in-out infinite;
+  }
+  .empty-note{
+    color:var(--muted);
+    font-size:13px;
+    text-align:center;
+    padding:20px 0;
+  }
+  nav.tabbar{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    background:#fff;
+    border-top:1px solid #eee;
+    display:flex;
+    padding:6px 0 max(6px, env(safe-area-inset-bottom));
+  }
+  nav.tabbar button{
+    flex:1;
+    background:none;
+    border:none;
+    font-size:12px;
+    color:var(--muted);
+    padding:8px 0;
+    cursor:pointer;
+  }
+  nav.tabbar button.active{
+    color:var(--accent);
+    font-weight:700;
+  }
+  .view{display:none;}
+  .view.active{display:block;}
+  .modal-backdrop{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    z-index:50;
+    align-items:flex-end;
+    justify-content:center;
+  }
+  .modal-backdrop.open{display:flex;}
+  .modal-sheet{
+    background:#fff;
+    border-radius:20px 20px 0 0;
+    padding:18px;
+    width:100%;
+    max-width:520px;
+    max-height:80vh;
+    overflow-y:auto;
+  }
+  .modal-sheet img{
+    width:100%;
+    border-radius:12px;
+    margin-bottom:12px;
+  }
+  .close-modal{
+    display:block;
+    margin:12px auto 0;
+    background:none;
+    border:none;
+    color:var(--muted);
+    font-size:14px;
+  }
+  .toast{
+    position:fixed;
+    bottom:80px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--ink);
+    color:#fff;
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:13px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s;
+    z-index:60;
+  }
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Lumen <span style="font-weight:400;color:var(--muted);font-size:14px;">(working title)</span></h1>
+  <p id="dateLabel"></p>
+  <p style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4;">This app supports reflection and mindfulness — it isn't therapy. If you're struggling, please reach out to a licensed professional or trusted support.</p>
+</header>
+
+<main>
+
+  <!-- HOME VIEW -->
+  <section id="view-home" class="view active">
+
+    <div id="glimmerBanner"></div>
+
+    <div class="card" style="text-align:center;">
+      <h2>Before You Begin</h2>
+      <div id="breathCircle"></div>
+      <p id="breathLabel" style="font-weight:600;color:var(--accent);margin:4px 0 10px;">Breathe in&hellip;</p>
+      <p style="font-size:14px;color:var(--muted);margin:0;">Close your eyes for a moment. Notice how you feel right now &mdash; before anything else.</p>
+    </div>
+
+    <div class="card">
+      <h2>Today's Prompt</h2>
+      <p class="prompt-text" id="promptText">Loading...</p>
+      <p class="streak" id="streakLabel"></p>
+    </div>
+
+    <div class="card">
+      <h2>Nervous System Check-In</h2>
+      <div class="ns-buttons">
+        <button class="ns-btn ventral" data-state="ventral">🟩 Settled</button>
+        <button class="ns-btn sympathetic" data-state="sympathetic">🟥 Racing</button>
+        <button class="ns-btn dorsal" data-state="dorsal">🟦 Heavy</button>
+      </div>
+      <p class="ns-hint" id="nsHint">Notice how you're feeling right now &mdash; there's no wrong answer.</p>
+      <p id="anchorLink" style="display:none;font-size:13px;color:var(--accent);font-weight:600;cursor:pointer;margin-top:6px;">⚓ Need something steady? View your anchors</p>
+
+      <div id="deeperToggle" style="display:none; margin-top:6px;">
+        <button id="deeperToggleBtn" style="background:none;border:none;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;padding:0;">Go deeper &#8964;</button>
+      </div>
+      <div id="deeperPanel" style="display:none; margin-top:12px; border-top:1px solid #eee; padding-top:12px;">
+        <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">Which of these feels closest?</p>
+        <div id="moodButtons" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        <div id="promptTypeSection" style="display:none;margin-top:14px;">
+          <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">Would you like to&hellip;</p>
+          <div id="promptTypeButtons" style="display:flex;flex-wrap:wrap;gap:8px;">
+            <button class="filter-chip" data-type="reflective">Just notice how I feel</button>
+            <button class="filter-chip" data-type="regulatory">Find something to help me shift</button>
+          </div>
+        </div>
+        <div id="needSection" style="display:none;margin-top:14px;">
+          <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">What do you need most right now?</p>
+          <div id="needButtons" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        </div>
+        <div id="tailoredPromptBox" style="display:none;margin-top:14px;background:#f4f1ea;border-radius:10px;padding:12px;font-size:14px;line-height:1.4;"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Capture This Moment</h2>
+      <div class="btn-row">
+        <label class="btn primary" style="text-align:center;">
+          📷 Take / Upload Photo
+          <input type="file" accept="image/*" id="photoInput" style="display:none;" />
+        </label>
+        <button class="btn" id="glimmerCta">✨ Show me a Glimmer</button>
+      </div>
+      <img id="preview" class="capture-preview" alt="preview" />
+      <textarea id="caption" placeholder="A brief reflection or caption (optional)&hellip;"></textarea>
+      <label class="glimmer-toggle">
+        <input type="checkbox" id="glimmerTag" />
+        Mark this as a Glimmer (a small moment of light or peace)
+      </label>
+      <button id="saveBtn">Save Entry</button>
+    </div>
+
+    <div class="card">
+      <h2>Reminders</h2>
+      <button class="btn" id="notifBtn" style="width:100%;">Enable gentle daily reminder</button>
+      <p class="ns-hint" id="notifStatus"></p>
+    </div>
+
+  </section>
+
+  <!-- GALLERY VIEW -->
+  <section id="view-gallery" class="view">
+    <div class="card">
+      <h2>Your Visual Journey</h2>
+      <div class="gallery-filters">
+        <div class="filter-chip active" data-filter="all">All</div>
+        <div class="filter-chip" data-filter="glimmer">Glimmers</div>
+        <div class="filter-chip" data-filter="ventral">🟩 Safe/Connected</div>
+        <div class="filter-chip" data-filter="sympathetic">🟥 Fight/Flight</div>
+        <div class="filter-chip" data-filter="dorsal">🟦 Freeze</div>
+        <div class="filter-chip" data-filter="deeper">🌊 Deeper reflections</div>
+      </div>
+      <div class="gallery-grid" id="galleryGrid"></div>
+      <p class="empty-note" id="emptyNote" style="display:none;">No entries yet &mdash; your journey starts with one photo.</p>
+    </div>
+  </section>
+
+  <!-- ANCHORS VIEW -->
+  <section id="view-anchors" class="view">
+    <div class="card">
+      <h2>Your Anchors</h2>
+      <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">
+        A small portfolio of images that hold the feeling of safety and connection &mdash;
+        so when a harder moment pulls you away, you have somewhere to return to.
+        Anchors are cues of <em>who</em>, <em>what</em>, <em>where</em>, or <em>when</em> you feel most grounded.
+      </p>
+
+      <div id="anchorCategoryButtons" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;"></div>
+
+      <img id="anchorPreview" class="capture-preview" alt="anchor preview" />
+      <div class="btn-row">
+        <label class="btn primary" style="text-align:center;">
+          📷 Take / Upload Photo
+          <input type="file" accept="image/*" id="anchorPhotoInput" style="display:none;" />
+        </label>
+      </div>
+      <textarea id="anchorCaption" placeholder="What makes this feel like safety or connection?"></textarea>
+      <button id="saveAnchorBtn">Save Anchor</button>
+    </div>
+
+    <div id="anchorGroups"></div>
+    <p class="empty-note" id="anchorEmptyNote" style="display:none;">No anchors saved yet &mdash; add your first one above.</p>
+  </section>
+
+</main>
+
+<nav class="tabbar">
+  <button class="active" data-view="home">🏠 Today</button>
+  <button data-view="gallery">🖼️ Journey</button>
+  <button data-view="anchors">⚓ Anchors</button>
+</nav>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal-sheet" id="modalSheet"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- Data: prompts & content ---------- */
+
+const PROMPTS = [
+  "Notice the light in the room you're in right now. Photograph where it falls.",
+  "Find something soft. Photograph its texture up close.",
+  "Photograph something that has survived a long time — a plant, an object, a mark on a wall.",
+  "Capture a shadow you'd normally walk past.",
+  "Photograph something that makes you feel steady.",
+  "Find a pattern in something ordinary — tiles, leaves, fabric.",
+  "Photograph the view from where you are sitting, exactly as it is.",
+  "Capture something in motion — or the stillness right after it stops.",
+  "Photograph a color that feels calming to you today.",
+  "Find something small that's easy to overlook. Give it your full attention.",
+  "Photograph something that represents a boundary — a door, a fence, an edge.",
+  "Capture a sign of life — something growing, breathing, changing.",
+  "Photograph the space around an object rather than the object itself.",
+  "Find warmth somewhere nearby — sunlight, a blanket, a cup, a color.",
+  "Photograph something you're grateful for today, however small.",
+  "Capture a texture that feels grounding to the touch.",
+  "Photograph something that makes you want to slow down.",
+  "Find a reflection — in glass, water, metal, or a screen.",
+  "Photograph a corner of your home you rarely notice.",
+  "Capture something that feels playful, even briefly."
+];
+
+const STATE_PROMPTS = {
+  sympathetic: "Racing — heart up, thoughts quick, hard to settle. Try photographing something with stillness in motion, or a clear edge or boundary to rest your attention on.",
+  dorsal: "Heavy — distant, foggy, low energy. Look for a bit of warmth or a quiet sign of life nearby — a patch of sun, a plant, something softly alive.",
+  ventral: "Settled — calm, open, connected. Capture a moment of connection, play, or ease — whatever is bringing you a little joy right now."
+};
+
+const GLIMMERS = [
+  "You are allowed to slow down.",
+  "Safety can be soft.",
+  "Even this moment counts.",
+  "Small is still real.",
+  "You don't have to earn rest.",
+  "Notice this: you're here, and that's enough.",
+  "This moment doesn't need to be productive to matter.",
+  "You're allowed to just look, without needing to fix anything."
+];
+
+const STATE_COLORS = {
+  sympathetic:"#e0584f",
+  dorsal:"#4a7ab5",
+  ventral:"#3fa793"
+};
+
+/* ---------- Deeper layer: moods & needs ---------- */
+
+// Each state maps to one or more labeled groups of moods. A null label
+// means "no group heading" (rendered as one plain row of buttons).
+const MOODS_BY_STATE = {
+  ventral: [
+    { label: null, moods: ["Solitude", "Joy"] }
+  ],
+  sympathetic: [
+    { label: "Harder to sit with", moods: ["Anxious Drive", "Alarmed", "On the Defense"] },
+    { label: "Energized, easier to ride", moods: ["Focused Drive", "Fired Up", "Determined"] }
+  ],
+  dorsal: [
+    { label: "Harder to sit with", moods: ["Immobility / Shut Down", "Numb", "Foggy / Disconnected"] },
+    { label: "Easier to rest in", moods: ["Rest and Digest", "Quiet Calm", "Withdrawn"] }
+  ]
+};
+
+const MOOD_FRAME = {
+  "Solitude": [
+    "You're in a quiet, reflective place right now.",
+    "There's a calm inwardness to this moment.",
+    "You're settled enough to just be with yourself.",
+    "This feels like a moment for your own company.",
+    "You're present with yourself, without needing anyone else right now."
+  ],
+  "Joy": [
+    "You're feeling open and connected right now.",
+    "There's a lightness to this moment.",
+    "You're feeling warmly connected to what's around you.",
+    "This moment has some ease and connection in it.",
+    "You're feeling good, and it shows."
+  ],
+  "Focused Drive": [
+    "You're energized and moving with purpose.",
+    "There's momentum here, and it feels like yours.",
+    "You're activated in a way that feels focused, not frantic.",
+    "This energy feels like it's taking you somewhere good.",
+    "You're in motion, and it feels clear rather than chaotic."
+  ],
+  "Anxious Drive": [
+    "You're activated, and it feels like a lot right now.",
+    "There's urgency here that's hard to settle.",
+    "You're keyed up, and it's okay to notice that without fixing it.",
+    "This feels like a lot to hold right now.",
+    "You're moving fast internally, even if you're standing still."
+  ],
+  "Immobility / Shut Down": [
+    "You're feeling far away or shut down right now.",
+    "There's a distance between you and things right now.",
+    "You feel low, and that's okay to just notice.",
+    "Things feel muted or hard to reach right now.",
+    "You're here, even if it feels far away."
+  ],
+  "Rest and Digest": [
+    "You're resting, and that's exactly what's needed.",
+    "This stillness is doing something quietly.",
+    "You're recovering, even if it doesn't look like much is happening.",
+    "This slow moment is allowed to just be slow.",
+    "You're letting yourself down-shift right now."
+  ],
+  "Numb": [
+    "You're feeling numb right now, like the volume's been turned down.",
+    "There's a flatness to this moment that's hard to push past.",
+    "You feel disconnected from your own feelings right now.",
+    "Things feel muted, like you're behind glass.",
+    "You're here, even though it doesn't feel like much is landing."
+  ],
+  "Foggy / Disconnected": [
+    "You're feeling foggy, like it's hard to think clearly right now.",
+    "There's a haze between you and things right now.",
+    "You feel a bit unmoored or spaced out.",
+    "It's hard to feel fully here right now, and that's okay to notice.",
+    "You're present, even if it feels like you're floating a little."
+  ],
+  "Quiet Calm": [
+    "You're settled into a quiet, easy stillness.",
+    "This calm feels restful, not forced.",
+    "There's a gentle quiet to this moment.",
+    "You're at ease, without needing anything to change.",
+    "This is a soft, peaceful kind of still."
+  ],
+  "Withdrawn": [
+    "You've pulled back a bit, and that feels like the right call right now.",
+    "There's a protective distance you're keeping right now.",
+    "You're giving yourself some space, on purpose.",
+    "This retreat feels chosen, not forced.",
+    "You're tucked away for a bit, and that's allowed."
+  ],
+  "Alarmed": [
+    "Your body is on high alert right now.",
+    "Something feels urgent or unsafe in this moment.",
+    "You're bracing, like something might happen.",
+    "Your senses are heightened right now.",
+    "It feels hard to feel safe right now."
+  ],
+  "On the Defense": [
+    "You're feeling defensive or on guard right now.",
+    "Something's got your hackles up.",
+    "You're ready to protect yourself right now.",
+    "There's an edge to how you're feeling.",
+    "You feel like you need to stand your ground."
+  ],
+  "Fired Up": [
+    "You're feeling passionate and enthusiastic right now.",
+    "There's an excited charge to this moment.",
+    "You feel lit up by something right now.",
+    "This energy feels bright and alive.",
+    "You're buzzing with enthusiasm."
+  ],
+  "Determined": [
+    "You're pushing through something with real grit.",
+    "You feel resolved to see this through.",
+    "There's a steady determination driving you right now.",
+    "You're locked in on getting this done.",
+    "This feels like quiet, stubborn resolve."
+  ]
+};
+
+function pickRandom(arr){
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+const MOOD_AFFIRMATION = {
+  "Solitude": "Your own company is enough right now.",
+  "Joy": "Let this connection be simple — you don't have to hold onto it, just notice it.",
+  "Focused Drive": "You're allowed to move at this pace. Let the momentum be yours.",
+  "Anxious Drive": "It's okay that this feels like a lot. You don't have to fix it right now — just notice it.",
+  "Alarmed": "You're allowed to feel alarmed without it being an emergency.",
+  "On the Defense": "You're allowed to protect yourself. You don't have to stay braced forever.",
+  "Fired Up": "Let this energy be enjoyed, not just spent.",
+  "Determined": "Your persistence counts, even in small steps.",
+  "Immobility / Shut Down": "It's okay to rest. You are safe, and you can return to action when you're ready.",
+  "Rest and Digest": "This stillness is doing something. You don't need to earn it.",
+  "Numb": "It's okay not to feel much right now. Feeling will return in its own time.",
+  "Foggy / Disconnected": "You don't have to think clearly right now. Just being here is enough.",
+  "Quiet Calm": "This peace is yours to simply enjoy, without needing to justify it.",
+  "Withdrawn": "Pulling back is a valid way to take care of yourself. You can come forward again when you're ready."
+};
+
+const NEEDS = ["Connection","Grounding","Safety","Self-Compassion","Creativity","Autonomy","Beauty"];
+
+const NEED_FOCUS = {
+  "Connection": [
+    "Photograph something that reminds you you're not alone — a person, a message, a shared object.",
+    "Capture something that connects you to someone else, even from a distance.",
+    "Find something that represents a relationship that matters to you.",
+    "Photograph a place where you've felt close to someone.",
+    "Take a photo of something that was given to you, or that you'd want to share.",
+    "Photograph a text, note, or object that shows someone was thinking of you.",
+    "Photograph something that makes you think of someone you care about.",
+    "Find something in your home that was made or chosen by someone who cares about you."
+  ],
+  "Grounding": [
+    "Photograph something solid and present — the floor beneath you, your hands, something within reach.",
+    "Capture something that doesn't move — a wall, a tree, something steady.",
+    "Take a photo of the surface you're standing or sitting on right now.",
+    "Find something heavy or weighted nearby.",
+    "Photograph something that's been in the same place for a long time.",
+    "Capture your own hands, feet, or something touching your body right now.",
+    "Find something with clear, defined edges.",
+    "Photograph something ordinary that's stayed exactly the same for years — a doorframe, a mug, a chair."
+  ],
+  "Safety": [
+    "Photograph something that feels protective or safe — a boundary, a shelter, a familiar space.",
+    "Capture a space in your home where you feel like you can exhale — a chair, a room, a corner.",
+    "Find something that represents shelter, however ordinary.",
+    "Photograph a door, wall, or boundary that feels reassuring.",
+    "Take a photo of somewhere you'd go if you needed to feel okay.",
+    "Capture an object that always stays the same — a keepsake, a piece of furniture, something on a shelf.",
+    "Find something that feels like it's looking out for you.",
+    "Photograph a corner of your world that feels entirely yours."
+  ],
+  "Self-Compassion": [
+    "Photograph something you'd offer a friend who was struggling — then let it be for you too.",
+    "Photograph a blanket, drink, or object you'd give someone who needed comforting.",
+    "Find something soft or comforting nearby.",
+    "Photograph something you're allowed to enjoy without earning it first — food, a chair, a blanket.",
+    "Take a photo of something that represents rest without guilt.",
+    "Photograph a spot where you can simply sit, without needing to do anything else there.",
+    "Find something imperfect that you still find likeable.",
+    "Photograph a small, ordinary object that makes you feel cared for."
+  ],
+  "Creativity": [
+    "Photograph something that sparks your imagination, however small or unfinished.",
+    "Capture something in-progress — a sketch, a half-formed idea, a work still becoming itself.",
+    "Find an unexpected angle on something ordinary.",
+    "Photograph something that doesn't have an obvious 'right' way to see it.",
+    "Take a photo that plays with light, shadow, or shape.",
+    "Capture something that makes you want to make something else.",
+    "Find a texture, color, or pattern that feels alive.",
+    "Photograph something you've never really looked at closely before."
+  ],
+  "Autonomy": [
+    "Photograph something that's entirely your own choice — no one else's expectations attached.",
+    "Capture something you picked, made, or arranged yourself.",
+    "Find something that represents a decision you're proud of.",
+    "Photograph a space that's yours alone.",
+    "Take a photo of something nobody told you to like.",
+    "Capture something that reflects how you'd do things, left to your own judgment.",
+    "Find something that feels like freedom, however small.",
+    "Photograph something you chose today, just because you wanted to."
+  ],
+  "Beauty": [
+    "Photograph something beautiful, exactly as it is, without needing to change it.",
+    "Capture something you almost walked past without noticing.",
+    "Find beauty in something ordinary or overlooked.",
+    "Photograph the way light is falling on something right now.",
+    "Take a photo of a color that catches you.",
+    "Capture something whose imperfection is part of its beauty.",
+    "Find something small and lovely nearby.",
+    "Photograph something that makes you want to pause, even briefly."
+  ]
+};
+
+const MOOD_DESCRIPTIONS = {
+  "Solitude": "Calm and alone, in a good way.",
+  "Joy": "Warm, connected, engaged with the moment or with others.",
+  "Focused Drive": "Energized and moving with purpose — activated, but not afraid.",
+  "Anxious Drive": "Activated by worry or urgency — keyed up, hard to settle.",
+  "Alarmed": "On high alert — bracing, unsafe, senses heightened.",
+  "On the Defense": "Guarded or defensive — ready to protect yourself.",
+  "Fired Up": "Excited, passionate, buzzing with enthusiasm.",
+  "Determined": "Gritty resolve — pushing through, locked in.",
+  "Rest and Digest": "Slowing down, recovering, restorative rest.",
+  "Immobility / Shut Down": "Numb, distant, or frozen — hard to feel much at all.",
+  "Numb": "Flat, muted, disconnected from your own feelings.",
+  "Foggy / Disconnected": "Hazy, unmoored, hard to think clearly or feel fully here.",
+  "Quiet Calm": "A gentle, easy stillness — restful without being heavy.",
+  "Withdrawn": "Pulled back on purpose — a chosen, protective retreat."
+};
+
+const MOOD_COLORS = {
+  "Joy": "#e8b93f",
+  "Solitude": "#7fb3d9",
+  "Focused Drive": "#5fae6e",
+  "Anxious Drive": "#d98a3d",
+  "Alarmed": "#d1495c",
+  "On the Defense": "#a83246",
+  "Fired Up": "#e0a83e",
+  "Determined": "#3d8f7a",
+  "Rest and Digest": "#4d9b95",
+  "Immobility / Shut Down": "#8a94a6",
+  "Numb": "#6b7a8f",
+  "Foggy / Disconnected": "#9aa8bd",
+  "Quiet Calm": "#6fb8b0",
+  "Withdrawn": "#5c6f8a"
+};
+
+// Reflective prompts: pure noticing, tied only to mood — no action requested.
+// Regulatory prompts (built from NEED_FOCUS below) are active, shifting tasks.
+const REFLECTIVE_PROMPTS = {
+  "Solitude": [
+    "Capture a space where being alone feels safe.",
+    "Take a photo of something that only makes sense to you right now.",
+    "Photograph the quiet you're sitting in.",
+    "Notice what your solitude looks like right now, and capture it.",
+    "Take a photo of something that needs no explanation."
+  ],
+  "Joy": [
+    "Take a photo of something that reflects your joy in this moment.",
+    "Capture what's making this moment feel light.",
+    "Photograph the thing that just made you smile.",
+    "Notice where the joy is right now, and take its photo.",
+    "Capture this feeling exactly as it is, before it passes."
+  ],
+  "Focused Drive": [
+    "Capture the energy you're moving with right now.",
+    "Photograph what focus looks like for you in this moment.",
+    "Take a photo of whatever you're moving toward.",
+    "Notice your own momentum, and capture it.",
+    "Photograph something that matches this feeling of purpose."
+  ],
+  "Anxious Drive": [
+    "Notice what this activation feels like, and photograph whatever's in front of you.",
+    "Capture something nearby, just to have a point of contact with the room.",
+    "Take a photo without trying to make it calm — just what's actually here.",
+    "Photograph something that's holding still, even if you're not.",
+    "Capture this moment exactly as urgent as it feels."
+  ],
+  "Immobility / Shut Down": [
+    "Capture the stillness. Nothing expected of you here.",
+    "Photograph exactly where you are, without needing to feel differently.",
+    "Take a photo of the quiet, however heavy it feels.",
+    "Notice what shut-down looks like right now, and let the photo hold it.",
+    "Capture this moment without needing it to be anything else."
+  ],
+  "Rest and Digest": [
+    "Capture what rest looks like for you right now.",
+    "Photograph the thing that's letting you slow down.",
+    "Take a photo of this stillness, exactly as it is.",
+    "Notice what recovery feels like, and capture a piece of it.",
+    "Photograph something that matches this quiet."
+  ],
+  "Numb": [
+    "Capture whatever is nearest, without needing to feel anything about it yet.",
+    "Photograph this flatness exactly as it is right now.",
+    "Take a photo without waiting to feel something first.",
+    "Notice what numb looks like today, and let the photo hold it.",
+    "Capture something ordinary — it doesn't have to mean anything right now."
+  ],
+  "Foggy / Disconnected": [
+    "Photograph whatever you can find, even if it feels hard to focus.",
+    "Capture the haze, exactly as thick as it feels.",
+    "Take a photo without needing to think clearly first.",
+    "Notice what disconnected looks like right now, and capture a piece of it.",
+    "Photograph something that's simply within reach."
+  ],
+  "Quiet Calm": [
+    "Capture this ease, exactly as quiet as it feels.",
+    "Photograph what stillness looks like when nothing's wrong.",
+    "Take a photo of whatever is keeping you settled right now.",
+    "Notice this calm, and let the photo simply hold it.",
+    "Photograph something that matches this gentle quiet."
+  ],
+  "Withdrawn": [
+    "Capture the space you've made for yourself right now.",
+    "Photograph what this retreat looks like from where you are.",
+    "Take a photo of whatever feels safely out of the way.",
+    "Notice what it's like to be tucked away, and capture a piece of it.",
+    "Photograph something that reflects this chosen distance."
+  ],
+  "Alarmed": [
+    "Notice what alarm feels like right now, and photograph whatever's nearest.",
+    "Capture something steady nearby, just to have a point of contact.",
+    "Take a photo without needing the alarm to go away first.",
+    "Photograph exactly how on-edge this moment feels.",
+    "Capture whatever is actually in front of you right now."
+  ],
+  "On the Defense": [
+    "Photograph something that represents a boundary you're holding right now.",
+    "Capture what it feels like to be on guard, without needing to soften it.",
+    "Take a photo of something solid, the way you feel solid right now.",
+    "Notice this readiness to protect yourself, and capture a piece of it.",
+    "Photograph something sturdy nearby."
+  ],
+  "Fired Up": [
+    "Capture what's lighting you up right now.",
+    "Photograph the thing that's got your attention and energy.",
+    "Take a photo of this excitement, exactly as bright as it feels.",
+    "Notice where the spark is, and capture it.",
+    "Photograph something that matches this enthusiasm."
+  ],
+  "Determined": [
+    "Capture what you're pushing toward right now.",
+    "Photograph something that represents your resolve.",
+    "Take a photo of whatever's keeping you locked in.",
+    "Notice this steadiness, and capture a piece of it.",
+    "Photograph something that reflects quiet persistence."
+  ]
+};
+
+let selectedMood = null;
+let selectedNeed = null;
+let selectedPromptType = null;
+let selectedAnchorCategory = null;
+
+function populateAnchorCategoryButtons(){
+  const container = document.getElementById("anchorCategoryButtons");
+  if(!container || container.children.length) return; // already populated once
+  ANCHOR_CATEGORIES.forEach(cat=>{
+    const btn = document.createElement("button");
+    btn.className = "filter-chip";
+    btn.textContent = cat;
+    btn.addEventListener("click", ()=>{
+      selectedAnchorCategory = cat;
+      Array.from(container.children).forEach(c=>c.classList.remove("active"));
+      btn.classList.add("active");
+    });
+    container.appendChild(btn);
+  });
+}
+
+async function renderAnchors(){
+  const anchors = await getAllAnchors();
+  const groupsEl = document.getElementById("anchorGroups");
+  const emptyNote = document.getElementById("anchorEmptyNote");
+  groupsEl.innerHTML = "";
+
+  if(anchors.length === 0){
+    emptyNote.style.display = "block";
+    return;
+  }
+  emptyNote.style.display = "none";
+
+  ANCHOR_CATEGORIES.forEach(cat=>{
+    const items = anchors.filter(a=>a.category === cat);
+    if(items.length === 0) return;
+
+    const card = document.createElement("div");
+    card.className = "card";
+    const h2 = document.createElement("h2");
+    h2.textContent = cat;
+    card.appendChild(h2);
+
+    const grid = document.createElement("div");
+    grid.className = "gallery-grid";
+    items.forEach(anchor=>{
+      const item = document.createElement("div");
+      item.className = "gallery-item";
+      const img = document.createElement("img");
+      img.src = anchor.photo;
+      item.appendChild(img);
+      item.addEventListener("click", ()=>openAnchorModal(anchor));
+      grid.appendChild(item);
+    });
+    card.appendChild(grid);
+    groupsEl.appendChild(card);
+  });
+}
+
+function openAnchorModal(anchor){
+  const sheet = document.getElementById("modalSheet");
+  sheet.innerHTML = "";
+  const img = document.createElement("img");
+  img.src = anchor.photo;
+  sheet.appendChild(img);
+
+  const catP = document.createElement("p");
+  catP.style.fontWeight = "600";
+  catP.style.color = "var(--accent)";
+  catP.textContent = anchor.category;
+  sheet.appendChild(catP);
+
+  if(anchor.caption){
+    const cap = document.createElement("p");
+    cap.textContent = anchor.caption;
+    sheet.appendChild(cap);
+  }
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.className = "close-modal";
+  deleteBtn.textContent = "Delete this anchor";
+  deleteBtn.style.color = "#c0392b";
+  deleteBtn.style.fontWeight = "600";
+  deleteBtn.addEventListener("click", async ()=>{
+    if(confirm("Delete this anchor? This can't be undone.")){
+      await deleteAnchor(anchor.id);
+      closeModal();
+      renderAnchors();
+      showToast("Anchor deleted");
+    }
+  });
+  sheet.appendChild(deleteBtn);
+
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "close-modal";
+  closeBtn.textContent = "Close";
+  closeBtn.addEventListener("click", closeModal);
+  sheet.appendChild(closeBtn);
+
+  document.getElementById("modalBackdrop").classList.add("open");
+}
+
+function resetDeeperPanel(){
+  selectedMood = null;
+  selectedNeed = null;
+  selectedPromptType = null;
+  document.getElementById("promptTypeSection").style.display = "none";
+  allMoodHintEls.forEach(el=>{ el.style.display = "none"; });
+  document.getElementById("needSection").style.display = "none";
+  document.getElementById("tailoredPromptBox").style.display = "none";
+  document.getElementById("tailoredPromptBox").textContent = "";
+  document.getElementById("deeperPanel").style.display = "none";
+  document.getElementById("deeperToggleBtn").textContent = "Go deeper ⌄";
+}
+
+let moodHintElements = {}; // mood name -> its group's hint <p> element
+let allMoodHintEls = [];   // every hint <p> in the currently rendered set
+
+function populateMoodButtons(state){
+  const container = document.getElementById("moodButtons");
+  container.innerHTML = "";
+  moodHintElements = {};
+  allMoodHintEls = [];
+
+  MOODS_BY_STATE[state].forEach(group=>{
+    if(group.label){
+      const label = document.createElement("p");
+      label.textContent = group.label;
+      label.style.cssText = "flex-basis:100%;font-size:12px;color:var(--muted);margin:6px 0 0;";
+      container.appendChild(label);
+    }
+    group.moods.forEach(mood=>{
+      const btn = document.createElement("button");
+      btn.className = "filter-chip";
+      btn.textContent = mood;
+      const color = MOOD_COLORS[mood];
+      if(color){
+        btn.style.borderColor = color;
+        btn.style.color = color;
+        btn.dataset.moodColor = color;
+      }
+      btn.addEventListener("click", ()=>selectMood(mood, container, btn));
+      container.appendChild(btn);
+    });
+    // one hint slot per group, placed right after that group's buttons —
+    // so the description shows directly under whichever row was tapped
+    const hintEl = document.createElement("p");
+    hintEl.style.cssText = "flex-basis:100%;display:none;font-size:13px;color:var(--muted);margin:6px 0 0;";
+    container.appendChild(hintEl);
+    allMoodHintEls.push(hintEl);
+    group.moods.forEach(mood=>{ moodHintElements[mood] = hintEl; });
+  });
+}
+
+function selectMood(mood, container, btn){
+  selectedMood = mood;
+  selectedNeed = null;
+  selectedPromptType = null;
+  Array.from(container.children).forEach(c=>{
+    c.classList.remove("active");
+    const col = c.dataset.moodColor;
+    if(col){
+      c.style.background = "#fff";
+      c.style.color = col;
+      c.style.borderColor = col;
+    }
+  });
+  btn.classList.add("active");
+  const activeColor = btn.dataset.moodColor;
+  if(activeColor){
+    btn.style.background = activeColor;
+    btn.style.color = "#fff";
+    btn.style.borderColor = activeColor;
+  }
+  allMoodHintEls.forEach(el=>{ el.style.display = "none"; });
+  const targetHint = moodHintElements[mood];
+  if(targetHint){
+    targetHint.textContent = MOOD_DESCRIPTIONS[mood] || "";
+    targetHint.style.display = MOOD_DESCRIPTIONS[mood] ? "block" : "none";
+  }
+  document.getElementById("promptTypeSection").style.display = "block";
+  document.getElementById("needSection").style.display = "none";
+  document.getElementById("tailoredPromptBox").style.display = "none";
+  Array.from(document.getElementById("promptTypeButtons").children).forEach(c=>c.classList.remove("active"));
+}
+
+function selectPromptType(type, container, btn){
+  selectedPromptType = type;
+  Array.from(container.children).forEach(c=>c.classList.remove("active"));
+  btn.classList.add("active");
+
+  const box = document.getElementById("tailoredPromptBox");
+
+  if(type === "reflective"){
+    document.getElementById("needSection").style.display = "none";
+    selectedNeed = null;
+    box.textContent = pickRandom(REFLECTIVE_PROMPTS[selectedMood]);
+    box.style.display = "block";
+  } else {
+    box.style.display = "none";
+    document.getElementById("needSection").style.display = "block";
+    populateNeedButtons();
+  }
+}
+
+function populateNeedButtons(){
+  const container = document.getElementById("needButtons");
+  container.innerHTML = "";
+  NEEDS.forEach(need=>{
+    const btn = document.createElement("button");
+    btn.className = "filter-chip";
+    btn.textContent = need;
+    btn.addEventListener("click", ()=>selectNeed(need, container, btn));
+    container.appendChild(btn);
+  });
+}
+
+function selectNeed(need, container, btn){
+  selectedNeed = need;
+  Array.from(container.children).forEach(c=>c.classList.remove("active"));
+  btn.classList.add("active");
+  const box = document.getElementById("tailoredPromptBox");
+  box.textContent = pickRandom(MOOD_FRAME[selectedMood]) + " " + pickRandom(NEED_FOCUS[need]);
+  box.style.display = "block";
+}
+
+/* ---------- IndexedDB ---------- */
+
+const DB_NAME = "lumen-journal";
+const DB_VERSION = 2;
+let db;
+
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = (e)=>{
+      const database = e.target.result;
+      if(!database.objectStoreNames.contains("entries")){
+        const store = database.createObjectStore("entries",{keyPath:"id", autoIncrement:true});
+        store.createIndex("timestamp","timestamp");
+      }
+      if(!database.objectStoreNames.contains("meta")){
+        database.createObjectStore("meta",{keyPath:"key"});
+      }
+      if(!database.objectStoreNames.contains("anchors")){
+        const anchorStore = database.createObjectStore("anchors",{keyPath:"id", autoIncrement:true});
+        anchorStore.createIndex("timestamp","timestamp");
+      }
+    };
+    req.onsuccess = (e)=>{ db = e.target.result; resolve(db); };
+    req.onerror = (e)=> reject(e);
+  });
+}
+
+function addEntry(entry){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction("entries","readwrite");
+    tx.objectStore("entries").add(entry);
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = (e)=>reject(e);
+  });
+}
+
+function deleteEntry(id){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction("entries","readwrite");
+    tx.objectStore("entries").delete(id);
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = (e)=>reject(e);
+  });
+}
+
+function getAllEntries(){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction("entries","readonly");
+    const req = tx.objectStore("entries").getAll();
+    req.onsuccess = ()=>resolve(req.result.sort((a,b)=>b.timestamp-a.timestamp));
+    req.onerror = (e)=>reject(e);
+  });
+}
+
+/* ---------- Ventral Vagal Anchors: a permanent portfolio of safety cues,
+   separate from the daily rotating journal. Categories follow Deb Dana's
+   who/what/where/when framework for autonomic cues of safety. ---------- */
+
+const ANCHOR_CATEGORIES = ["Who","What","Where","When"];
+
+function addAnchor(anchor){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction("anchors","readwrite");
+    tx.objectStore("anchors").add(anchor);
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = (e)=>reject(e);
+  });
+}
+
+function getAllAnchors(){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction("anchors","readonly");
+    const req = tx.objectStore("anchors").getAll();
+    req.onsuccess = ()=>resolve(req.result.sort((a,b)=>b.timestamp-a.timestamp));
+    req.onerror = (e)=>reject(e);
+  });
+}
+
+function deleteAnchor(id){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction("anchors","readwrite");
+    tx.objectStore("anchors").delete(id);
+    tx.oncomplete = ()=>resolve();
+    tx.onerror = (e)=>reject(e);
+  });
+}
+
+function getMeta(key){
+  return new Promise((resolve)=>{
+    const tx = db.transaction("meta","readonly");
+    const req = tx.objectStore("meta").get(key);
+    req.onsuccess = ()=>resolve(req.result ? req.result.value : null);
+    req.onerror = ()=>resolve(null);
+  });
+}
+
+function setMeta(key,value){
+  return new Promise((resolve)=>{
+    const tx = db.transaction("meta","readwrite");
+    tx.objectStore("meta").put({key,value});
+    tx.oncomplete = ()=>resolve();
+  });
+}
+
+/* ---------- State ---------- */
+
+let selectedState = null;
+let currentEntryCount = 0;
+
+/* ---------- Init ---------- */
+
+async function init(){
+  await openDB();
+
+  document.getElementById("dateLabel").textContent = new Date().toLocaleDateString(undefined,{
+    weekday:"long", month:"long", day:"numeric"
+  });
+
+  let dayIndex = await getMeta("dayIndex");
+  if(dayIndex === null){
+    dayIndex = 0;
+    await setMeta("dayIndex", dayIndex);
+    await setMeta("firstLaunch", Date.now());
+  }
+  document.getElementById("promptText").textContent = PROMPTS[dayIndex % PROMPTS.length];
+
+  const entries = await getAllEntries();
+  currentEntryCount = entries.length;
+  document.getElementById("streakLabel").textContent =
+    entries.length === 0
+      ? "Your first entry starts the journey."
+      : `${entries.length} entr${entries.length===1?"y":"ies"} captured so far.`;
+
+  renderGallery(entries);
+  wireEvents();
+  checkNotifStatus();
+  populateAnchorCategoryButtons();
+  renderAnchors();
+}
+
+/* ---------- Nervous system check-in ---------- */
+
+function wireEvents(){
+
+  document.querySelectorAll(".ns-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      document.querySelectorAll(".ns-btn").forEach(b=>b.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedState = btn.dataset.state;
+      document.getElementById("nsHint").textContent = STATE_PROMPTS[selectedState];
+
+      const anchorLink = document.getElementById("anchorLink");
+      anchorLink.style.display = (selectedState === "sympathetic" || selectedState === "dorsal") ? "block" : "none";
+
+      document.getElementById("deeperToggle").style.display = "block";
+      resetDeeperPanel();
+      populateMoodButtons(selectedState);
+    });
+  });
+
+  const promptTypeContainer = document.getElementById("promptTypeButtons");
+  Array.from(promptTypeContainer.children).forEach(btn=>{
+    btn.addEventListener("click", ()=>selectPromptType(btn.dataset.type, promptTypeContainer, btn));
+  });
+
+  document.getElementById("deeperToggleBtn").addEventListener("click", ()=>{
+    const panel = document.getElementById("deeperPanel");
+    const isOpen = panel.style.display === "block";
+    panel.style.display = isOpen ? "none" : "block";
+    document.getElementById("deeperToggleBtn").textContent = isOpen ? "Go deeper ⌄" : "Hide ⌃";
+  });
+
+  document.getElementById("photoInput").addEventListener("change", (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      const img = document.getElementById("preview");
+      img.src = ev.target.result;
+      img.style.display = "block";
+      img.dataset.dataurl = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById("glimmerCta").addEventListener("click", ()=>{
+    const banner = document.getElementById("glimmerBanner");
+    banner.textContent = GLIMMERS[Math.floor(Math.random()*GLIMMERS.length)];
+    banner.style.display = "block";
+    setTimeout(()=>{ banner.style.display = "none"; }, 8000);
+  });
+
+  document.getElementById("saveBtn").addEventListener("click", saveEntry);
+
+  document.querySelectorAll("nav.tabbar button").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      document.querySelectorAll("nav.tabbar button").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+      document.getElementById("view-"+btn.dataset.view).classList.add("active");
+    });
+  });
+
+  document.querySelectorAll(".filter-chip").forEach(chip=>{
+    chip.addEventListener("click", async ()=>{
+      document.querySelectorAll(".filter-chip").forEach(c=>c.classList.remove("active"));
+      chip.classList.add("active");
+      const entries = await getAllEntries();
+      renderGallery(entries, chip.dataset.filter);
+    });
+  });
+
+  document.getElementById("modalBackdrop").addEventListener("click",(e)=>{
+    if(e.target.id === "modalBackdrop") closeModal();
+  });
+
+  document.getElementById("notifBtn").addEventListener("click", enableReminders);
+
+  document.getElementById("anchorLink").addEventListener("click", ()=>{
+    document.querySelectorAll("nav.tabbar button").forEach(b=>b.classList.remove("active"));
+    document.querySelector('nav.tabbar button[data-view="anchors"]').classList.add("active");
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    document.getElementById("view-anchors").classList.add("active");
+  });
+
+  document.getElementById("anchorPhotoInput").addEventListener("change", (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      const img = document.getElementById("anchorPreview");
+      img.src = ev.target.result;
+      img.style.display = "block";
+      img.dataset.dataurl = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById("saveAnchorBtn").addEventListener("click", async ()=>{
+    const img = document.getElementById("anchorPreview");
+    const caption = document.getElementById("anchorCaption").value.trim();
+
+    if(!img.dataset.dataurl){
+      showToast("Add a photo first.");
+      return;
+    }
+    if(!selectedAnchorCategory){
+      showToast("Choose who, what, where, or when this represents.");
+      return;
+    }
+
+    await addAnchor({
+      timestamp: Date.now(),
+      photo: img.dataset.dataurl,
+      category: selectedAnchorCategory,
+      caption
+    });
+
+    img.style.display = "none";
+    img.removeAttribute("src");
+    delete img.dataset.dataurl;
+    document.getElementById("anchorCaption").value = "";
+    Array.from(document.getElementById("anchorCategoryButtons").children).forEach(c=>c.classList.remove("active"));
+    selectedAnchorCategory = null;
+
+    renderAnchors();
+    showToast("Anchor saved ⚓");
+  });
+}
+
+async function saveEntry(){
+  const img = document.getElementById("preview");
+  const caption = document.getElementById("caption").value.trim();
+  const isGlimmer = document.getElementById("glimmerTag").checked;
+
+  if(!img.dataset.dataurl && !caption){
+    showToast("Add a photo or a note first.");
+    return;
+  }
+
+  const affirmationMood = selectedMood; // capture before reset
+
+  const entry = {
+    timestamp: Date.now(),
+    photo: img.dataset.dataurl || null,
+    caption,
+    state: selectedState,
+    mood: selectedMood,
+    need: selectedNeed,
+    promptType: selectedPromptType,
+    isGlimmer,
+    prompt: document.getElementById("promptText").textContent
+  };
+
+  await addEntry(entry);
+
+  // advance day index for next visit
+  let dayIndex = await getMeta("dayIndex");
+  dayIndex = (dayIndex || 0) + 1;
+  await setMeta("dayIndex", dayIndex);
+
+  // reset form
+  img.style.display = "none";
+  img.removeAttribute("src");
+  delete img.dataset.dataurl;
+  document.getElementById("caption").value = "";
+  document.getElementById("glimmerTag").checked = false;
+  document.querySelectorAll(".ns-btn").forEach(b=>b.classList.remove("selected"));
+  selectedState = null;
+  document.getElementById("deeperToggle").style.display = "none";
+  resetDeeperPanel();
+  document.getElementById("nsHint").textContent = "Notice how you're feeling right now — there's no wrong answer.";
+  document.getElementById("promptText").textContent = PROMPTS[dayIndex % PROMPTS.length];
+
+  const entries = await getAllEntries();
+  currentEntryCount = entries.length;
+  document.getElementById("streakLabel").textContent = `${entries.length} entr${entries.length===1?"y":"ies"} captured so far.`;
+  renderGallery(entries);
+
+  if(affirmationMood && MOOD_AFFIRMATION[affirmationMood]){
+    showToast(MOOD_AFFIRMATION[affirmationMood]);
+  } else {
+    showToast("Saved to your journey ✨");
+  }
+}
+
+/* ---------- Gallery ---------- */
+
+function renderGallery(entries, filter){
+  filter = filter || "all";
+  const grid = document.getElementById("galleryGrid");
+  const emptyNote = document.getElementById("emptyNote");
+  grid.innerHTML = "";
+
+  let filtered = entries;
+  if(filter === "glimmer") filtered = entries.filter(e=>e.isGlimmer);
+  else if(filter === "deeper") filtered = entries.filter(e=>e.mood);
+  else if(filter !== "all") filtered = entries.filter(e=>e.state === filter);
+
+  if(filtered.length === 0){
+    emptyNote.style.display = "block";
+    return;
+  }
+  emptyNote.style.display = "none";
+
+  filtered.forEach(entry=>{
+    const div = document.createElement("div");
+    div.className = "gallery-item";
+    const img = document.createElement("img");
+    img.src = entry.photo || "";
+    if(!entry.photo){
+      div.style.background = "#eee8dc";
+      div.style.display = "flex";
+      div.style.alignItems = "center";
+      div.style.justifyContent = "center";
+      div.style.fontSize = "11px";
+      div.style.color = "#7a7a86";
+      div.style.padding = "6px";
+      div.textContent = entry.caption ? entry.caption.slice(0,40) : "Note";
+    } else {
+      div.appendChild(img);
+    }
+    if(entry.mood || entry.state){
+      const dot = document.createElement("div");
+      dot.className = "dot";
+      dot.style.background = (entry.mood && MOOD_COLORS[entry.mood]) || STATE_COLORS[entry.state];
+      div.appendChild(dot);
+    }
+    div.addEventListener("click", ()=>openModal(entry));
+    grid.appendChild(div);
+  });
+}
+
+function openModal(entry){
+  const sheet = document.getElementById("modalSheet");
+  sheet.innerHTML = "";
+  if(entry.photo){
+    const img = document.createElement("img");
+    img.src = entry.photo;
+    sheet.appendChild(img);
+  }
+  const date = document.createElement("p");
+  date.style.color = "var(--muted)";
+  date.style.fontSize = "13px";
+  date.textContent = new Date(entry.timestamp).toLocaleString();
+  sheet.appendChild(date);
+
+  if(entry.prompt){
+    const p = document.createElement("p");
+    p.style.fontStyle = "italic";
+    p.style.fontSize = "13px";
+    p.textContent = "Prompt: " + entry.prompt;
+    sheet.appendChild(p);
+  }
+  if(entry.caption){
+    const cap = document.createElement("p");
+    cap.textContent = entry.caption;
+    sheet.appendChild(cap);
+  }
+  if(entry.mood){
+    const moodP = document.createElement("p");
+    moodP.style.fontSize = "13px";
+    moodP.style.fontWeight = "600";
+    moodP.style.color = MOOD_COLORS[entry.mood] || "var(--accent)";
+    moodP.textContent = "Mood: " + entry.mood + (entry.need ? " · Need: " + entry.need : "");
+    sheet.appendChild(moodP);
+  }
+  if(entry.isGlimmer){
+    const g = document.createElement("p");
+    g.textContent = "✨ Marked as a Glimmer";
+    g.style.color = "#b8860b";
+    sheet.appendChild(g);
+  }
+  const deleteBtn = document.createElement("button");
+  deleteBtn.className = "close-modal";
+  deleteBtn.textContent = "Delete this entry";
+  deleteBtn.style.color = "#c0392b";
+  deleteBtn.style.fontWeight = "600";
+  deleteBtn.addEventListener("click", async ()=>{
+    if(confirm("Delete this entry? This can't be undone.")){
+      await deleteEntry(entry.id);
+      closeModal();
+      const entries = await getAllEntries();
+      currentEntryCount = entries.length;
+      document.getElementById("streakLabel").textContent =
+        entries.length === 0
+          ? "Your first entry starts the journey."
+          : `${entries.length} entr${entries.length===1?"y":"ies"} captured so far.`;
+      const activeChip = document.querySelector(".filter-chip.active");
+      renderGallery(entries, activeChip ? activeChip.dataset.filter : "all");
+      showToast("Entry deleted");
+    }
+  });
+  sheet.appendChild(deleteBtn);
+
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "close-modal";
+  closeBtn.textContent = "Close";
+  closeBtn.addEventListener("click", closeModal);
+  sheet.appendChild(closeBtn);
+
+  document.getElementById("modalBackdrop").classList.add("open");
+}
+
+function closeModal(){
+  document.getElementById("modalBackdrop").classList.remove("open");
+}
+
+/* ---------- Notifications (best-effort; full scheduling needs native app later) ---------- */
+
+function checkNotifStatus(){
+  const statusEl = document.getElementById("notifStatus");
+  if(!("Notification" in window)){
+    statusEl.textContent = "Reminders aren't supported in this browser.";
+    return;
+  }
+  if(Notification.permission === "granted"){
+    statusEl.textContent = "Reminders enabled. (Note: browser-based reminders are best-effort — a native app would allow reliable scheduled push notifications.)";
+  }
+}
+
+function enableReminders(){
+  if(!("Notification" in window)){
+    showToast("Notifications aren't supported in this browser.");
+    return;
+  }
+  Notification.requestPermission().then(permission=>{
+    const statusEl = document.getElementById("notifStatus");
+    if(permission === "granted"){
+      statusEl.textContent = "Reminders enabled. (Note: browser-based reminders are best-effort — a native app would allow reliable scheduled push notifications.)";
+      new Notification("Lumen", { body: "You're all set. We'll gently nudge you to check in." });
+    } else {
+      statusEl.textContent = "Reminders weren't enabled.";
+    }
+  });
+}
+
+/* ---------- Toast ---------- */
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+/* ---------- Service worker (installability) ---------- */
+
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+
+/* ---------- Breathing cue: 4s inhale / 6s exhale, a calming ratio ---------- */
+
+function breathCycle(){
+  const label = document.getElementById("breathLabel");
+  if(!label) return;
+  label.textContent = "Breathe in…";
+  setTimeout(()=>{
+    label.textContent = "Breathe out…";
+    setTimeout(breathCycle, 6000);
+  }, 4000);
+}
+breathCycle();
+
+init();
+</script>
+
+</body>
+</html>
