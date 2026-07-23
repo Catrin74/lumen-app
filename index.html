@@ -328,12 +328,6 @@
     </div>
 
     <div class="card">
-      <h2>Today's Prompt</h2>
-      <p class="prompt-text" id="promptText">Loading...</p>
-      <p class="streak" id="streakLabel"></p>
-    </div>
-
-    <div class="card">
       <h2>Nervous System Check-In</h2>
       <div class="ns-buttons">
         <button class="ns-btn ventral" data-state="ventral">🟩 Settled</button>
@@ -361,7 +355,14 @@
           <div id="needButtons" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
         </div>
         <div id="tailoredPromptBox" style="display:none;margin-top:14px;background:#f4f1ea;border-radius:10px;padding:12px;font-size:14px;line-height:1.4;"></div>
+        <div id="moodCompanionBox" style="display:none;margin-top:14px;border-top:1px solid #eee;padding-top:12px;"></div>
       </div>
+    </div>
+
+    <div class="card">
+      <h2>Today's Prompt</h2>
+      <p class="prompt-text" id="promptText">Loading...</p>
+      <p class="streak" id="streakLabel"></p>
     </div>
 
     <div class="card">
@@ -434,12 +435,27 @@
     <p class="empty-note" id="anchorEmptyNote" style="display:none;">No anchors saved yet &mdash; add your first one above.</p>
   </section>
 
+  <!-- MOOD COMPANIONS VIEW -->
+  <section id="view-moods" class="view">
+    <div class="card">
+      <h2>Mood Companions</h2>
+      <p style="font-size:13px;color:var(--muted);margin:0;">
+        For each mood, a photo of what it looks or feels like, and &mdash; when you find one &mdash;
+        a photo of something that helps you shift or calm from it. These build up gradually,
+        one mood at a time, whenever you land there in a check-in. There's no right or wrong,
+        and it's not about taking a perfect picture.
+      </p>
+    </div>
+    <div id="moodCompanionGrid"></div>
+  </section>
+
 </main>
 
 <nav class="tabbar">
   <button class="active" data-view="home">🏠 Today</button>
   <button data-view="gallery">🖼️ Journey</button>
   <button data-view="anchors">⚓ Anchors</button>
+  <button data-view="moods">🎭 Moods</button>
 </nav>
 
 <div class="modal-backdrop" id="modalBackdrop">
@@ -514,6 +530,12 @@ const MOODS_BY_STATE = {
     { label: "Easier to rest in", moods: ["Rest and Digest", "Quiet Calm", "Withdrawn"] }
   ]
 };
+
+// Flat list of every mood name, in display order, used by the Mood
+// Companions library view.
+const ALL_MOODS = Object.keys(MOODS_BY_STATE).flatMap(
+  state => MOODS_BY_STATE[state].flatMap(group => group.moods)
+);
 
 const MOOD_FRAME = {
   "Solitude": [
@@ -960,6 +982,8 @@ function resetDeeperPanel(){
   document.getElementById("needSection").style.display = "none";
   document.getElementById("tailoredPromptBox").style.display = "none";
   document.getElementById("tailoredPromptBox").textContent = "";
+  document.getElementById("moodCompanionBox").style.display = "none";
+  document.getElementById("moodCompanionBox").innerHTML = "";
   document.getElementById("deeperPanel").style.display = "none";
   document.getElementById("deeperToggleBtn").textContent = "Go deeper ⌄";
 }
@@ -1033,6 +1057,7 @@ function selectMood(mood, container, btn){
   document.getElementById("needSection").style.display = "none";
   document.getElementById("tailoredPromptBox").style.display = "none";
   Array.from(document.getElementById("promptTypeButtons").children).forEach(c=>c.classList.remove("active"));
+  renderMoodCompanionBox(mood);
 }
 
 function selectPromptType(type, container, btn){
@@ -1078,7 +1103,7 @@ function selectNeed(need, container, btn){
 /* ---------- IndexedDB ---------- */
 
 const DB_NAME = "lumen-journal";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 let db;
 
 function openDB(){
@@ -1096,6 +1121,9 @@ function openDB(){
       if(!database.objectStoreNames.contains("anchors")){
         const anchorStore = database.createObjectStore("anchors",{keyPath:"id", autoIncrement:true});
         anchorStore.createIndex("timestamp","timestamp");
+      }
+      if(!database.objectStoreNames.contains("moodCompanions")){
+        database.createObjectStore("moodCompanions",{keyPath:"mood"});
       }
     };
     req.onsuccess = (e)=>{ db = e.target.result; resolve(db); };
@@ -1163,6 +1191,152 @@ function deleteAnchor(id){
   });
 }
 
+/* ---------- Mood Companions: a state photo (what this mood looks/feels
+   like) and a counter photo (something that helps shift or calm from it),
+   one pair per mood, built up gradually over time as each mood is
+   encountered. Not about "getting the photo right" — just noticing. ---------- */
+
+function getMoodCompanion(mood){
+  return new Promise((resolve)=>{
+    const tx = db.transaction("moodCompanions","readonly");
+    const req = tx.objectStore("moodCompanions").get(mood);
+    req.onsuccess = ()=>resolve(req.result || null);
+    req.onerror = ()=>resolve(null);
+  });
+}
+
+function saveMoodCompanion(mood, updates){
+  return new Promise(async (resolve,reject)=>{
+    const existing = await getMoodCompanion(mood);
+    const record = Object.assign({ mood }, existing || {}, updates);
+    const tx = db.transaction("moodCompanions","readwrite");
+    tx.objectStore("moodCompanions").put(record);
+    tx.oncomplete = ()=>resolve(record);
+    tx.onerror = (e)=>reject(e);
+  });
+}
+
+function getAllMoodCompanions(){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction("moodCompanions","readonly");
+    const req = tx.objectStore("moodCompanions").getAll();
+    req.onsuccess = ()=>resolve(req.result);
+    req.onerror = (e)=>reject(e);
+  });
+}
+
+async function renderMoodCompanionBox(mood){
+  const box = document.getElementById("moodCompanionBox");
+  const companion = await getMoodCompanion(mood);
+  box.innerHTML = "";
+
+  if(!companion || !companion.statePhoto){
+    box.innerHTML =
+      '<p style="font-size:13px;color:var(--muted);margin:0 0 8px;">' +
+      'First time landing on <strong>' + mood + '</strong> here. Want to add a photo of what this ' +
+      'looks or feels like for you? There\'s no right or wrong, and it\'s not about taking a perfect picture.</p>' +
+      '<div class="btn-row">' +
+      '<label class="btn" style="text-align:center;">📷 Add a photo' +
+      '<input type="file" accept="image/*" id="stateCompanionInput" style="display:none;" /></label>' +
+      '<button class="btn" id="skipCompanionBtn" type="button">Maybe later</button>' +
+      '</div>';
+    box.style.display = "block";
+    document.getElementById("stateCompanionInput").addEventListener("change", (e)=>handleCompanionPhoto(e, mood, "statePhoto"));
+    document.getElementById("skipCompanionBtn").addEventListener("click", ()=>{ box.style.display = "none"; });
+  } else if(!companion.counterPhoto){
+    box.innerHTML =
+      '<p style="font-size:13px;color:var(--muted);margin:0 0 8px;">' +
+      'Want to add a photo that helps you shift or calm from <strong>' + mood + '</strong>? Same as before &mdash; ' +
+      'no right or wrong, just whatever comes to mind.</p>' +
+      '<div class="btn-row">' +
+      '<label class="btn" style="text-align:center;">📷 Add a photo' +
+      '<input type="file" accept="image/*" id="counterCompanionInput" style="display:none;" /></label>' +
+      '<button class="btn" id="skipCompanionBtn" type="button">Maybe later</button>' +
+      '</div>';
+    box.style.display = "block";
+    document.getElementById("counterCompanionInput").addEventListener("change", (e)=>handleCompanionPhoto(e, mood, "counterPhoto"));
+    document.getElementById("skipCompanionBtn").addEventListener("click", ()=>{ box.style.display = "none"; });
+  } else {
+    box.innerHTML =
+      '<p style="font-size:12px;color:var(--muted);margin:0 0 6px;">Something that\'s helped before:</p>' +
+      '<img src="' + companion.counterPhoto + '" alt="counter photo" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;" />';
+    box.style.display = "block";
+  }
+}
+
+function handleCompanionPhoto(e, mood, field){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async (ev)=>{
+    const updates = {};
+    updates[field] = ev.target.result;
+    updates[field + "Date"] = Date.now();
+    await saveMoodCompanion(mood, updates);
+    document.getElementById("moodCompanionBox").style.display = "none";
+    showToast(field === "statePhoto" ? "Saved — this builds up over time." : "Saved as a counter photo for " + mood + ".");
+    renderMoodsView();
+  };
+  reader.readAsDataURL(file);
+}
+
+async function renderMoodsView(){
+  const grid = document.getElementById("moodCompanionGrid");
+  if(!grid) return;
+  const companions = await getAllMoodCompanions();
+  const byMood = {};
+  companions.forEach(c=>{ byMood[c.mood] = c; });
+
+  grid.innerHTML = "";
+  ALL_MOODS.forEach(mood=>{
+    const c = byMood[mood] || {};
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML =
+      '<h2 style="font-size:15px;">' + mood + '</h2>' +
+      '<div style="display:flex;gap:10px;">' +
+        '<div style="flex:1;">' +
+          '<p style="font-size:11px;color:var(--muted);margin:0 0 4px;">What it looks like</p>' +
+          (c.statePhoto
+            ? '<img src="' + c.statePhoto + '" style="width:100%;height:90px;object-fit:cover;border-radius:8px;" />'
+            : '<div style="width:100%;height:90px;border-radius:8px;background:#f4f1ea;"></div>') +
+          '<label class="btn" style="text-align:center;font-size:12px;margin-top:6px;display:block;">' +
+            (c.statePhoto ? "Replace" : "Add") +
+            '<input type="file" accept="image/*" data-mood="' + mood + '" data-field="statePhoto" class="companionReplaceInput" style="display:none;" />' +
+          '</label>' +
+        '</div>' +
+        '<div style="flex:1;">' +
+          '<p style="font-size:11px;color:var(--muted);margin:0 0 4px;">What helps me shift</p>' +
+          (c.counterPhoto
+            ? '<img src="' + c.counterPhoto + '" style="width:100%;height:90px;object-fit:cover;border-radius:8px;" />'
+            : '<div style="width:100%;height:90px;border-radius:8px;background:#f4f1ea;"></div>') +
+          '<label class="btn" style="text-align:center;font-size:12px;margin-top:6px;display:block;">' +
+            (c.counterPhoto ? "Replace" : "Add") +
+            '<input type="file" accept="image/*" data-mood="' + mood + '" data-field="counterPhoto" class="companionReplaceInput" style="display:none;" />' +
+          '</label>' +
+        '</div>' +
+      '</div>';
+    grid.appendChild(card);
+  });
+
+  document.querySelectorAll(".companionReplaceInput").forEach(input=>{
+    input.addEventListener("change", (e)=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = async (ev)=>{
+        const updates = {};
+        updates[input.dataset.field] = ev.target.result;
+        updates[input.dataset.field + "Date"] = Date.now();
+        await saveMoodCompanion(input.dataset.mood, updates);
+        renderMoodsView();
+        showToast("Saved.");
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+}
+
 function getMeta(key){
   return new Promise((resolve)=>{
     const tx = db.transaction("meta","readonly");
@@ -1214,6 +1388,7 @@ async function init(){
   checkNotifStatus();
   populateAnchorCategoryButtons();
   renderAnchors();
+  renderMoodsView();
 }
 
 /* ---------- Nervous system check-in ---------- */
