@@ -1260,7 +1260,7 @@ async function renderMoodCompanionBox(mood){
     const needsShift = MOODS_NEEDING_SHIFT.has(mood);
     const promptText = needsShift
       ? 'Want to add a photo that helps you shift or calm from <strong>' + mood + '</strong>? Same as before &mdash; no right or wrong, just whatever comes to mind.'
-      : 'Want to add a photo that captures more of this feeling of <strong>' + mood + '</strong> &mdash; something that helps you savor or deepen it? No right or wrong here either.';
+      : 'Want to add another photo that captures more of this feeling of <strong>' + mood + '</strong>? No right or wrong here either.';
     box.innerHTML =
       '<p style="font-size:13px;color:var(--muted);margin:0 0 8px;">' + promptText + '</p>' +
       '<div class="btn-row">' +
@@ -1273,7 +1273,7 @@ async function renderMoodCompanionBox(mood){
     document.getElementById("skipCompanionBtn").addEventListener("click", ()=>{ box.style.display = "none"; });
   } else {
     const needsShift = MOODS_NEEDING_SHIFT.has(mood);
-    const label = needsShift ? "Something that\'s helped before:" : "Something that deepens this:";
+    const label = needsShift ? "Something that\'s helped before:" : "More of this feeling:";
     box.innerHTML =
       '<p style="font-size:12px;color:var(--muted);margin:0 0 6px;">' + label + '</p>' +
       '<img src="' + companion.counterPhoto + '" alt="counter photo" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;" />';
@@ -1308,7 +1308,7 @@ async function renderMoodsView(){
   ALL_MOODS.forEach(mood=>{
     const c = byMood[mood] || {};
     const needsShift = MOODS_NEEDING_SHIFT.has(mood);
-    const counterLabel = needsShift ? "What helps me shift" : "What deepens this";
+    const counterLabel = needsShift ? "What helps me shift" : "More of this feeling";
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML =
