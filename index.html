@@ -537,6 +537,19 @@ const ALL_MOODS = Object.keys(MOODS_BY_STATE).flatMap(
   state => MOODS_BY_STATE[state].flatMap(group => group.moods)
 );
 
+// Moods in "Harder to sit with" groups genuinely benefit from a counter
+// photo that helps shift or calm. Everything else (settled moods, and the
+// "easier to ride" / "easier to rest in" moods) doesn't need shifting away
+// from — the second photo there is about savoring and deepening instead.
+const MOODS_NEEDING_SHIFT = new Set();
+Object.values(MOODS_BY_STATE).forEach(groups=>{
+  groups.forEach(group=>{
+    if(group.label === "Harder to sit with"){
+      group.moods.forEach(m=>MOODS_NEEDING_SHIFT.add(m));
+    }
+  });
+});
+
 const MOOD_FRAME = {
   "Solitude": [
     "You're in a quiet, reflective place right now.",
@@ -1244,10 +1257,12 @@ async function renderMoodCompanionBox(mood){
     document.getElementById("stateCompanionInput").addEventListener("change", (e)=>handleCompanionPhoto(e, mood, "statePhoto"));
     document.getElementById("skipCompanionBtn").addEventListener("click", ()=>{ box.style.display = "none"; });
   } else if(!companion.counterPhoto){
+    const needsShift = MOODS_NEEDING_SHIFT.has(mood);
+    const promptText = needsShift
+      ? 'Want to add a photo that helps you shift or calm from <strong>' + mood + '</strong>? Same as before &mdash; no right or wrong, just whatever comes to mind.'
+      : 'Want to add a photo that captures more of this feeling of <strong>' + mood + '</strong> &mdash; something that helps you savor or deepen it? No right or wrong here either.';
     box.innerHTML =
-      '<p style="font-size:13px;color:var(--muted);margin:0 0 8px;">' +
-      'Want to add a photo that helps you shift or calm from <strong>' + mood + '</strong>? Same as before &mdash; ' +
-      'no right or wrong, just whatever comes to mind.</p>' +
+      '<p style="font-size:13px;color:var(--muted);margin:0 0 8px;">' + promptText + '</p>' +
       '<div class="btn-row">' +
       '<label class="btn" style="text-align:center;">📷 Add a photo' +
       '<input type="file" accept="image/*" id="counterCompanionInput" style="display:none;" /></label>' +
@@ -1257,8 +1272,10 @@ async function renderMoodCompanionBox(mood){
     document.getElementById("counterCompanionInput").addEventListener("change", (e)=>handleCompanionPhoto(e, mood, "counterPhoto"));
     document.getElementById("skipCompanionBtn").addEventListener("click", ()=>{ box.style.display = "none"; });
   } else {
+    const needsShift = MOODS_NEEDING_SHIFT.has(mood);
+    const label = needsShift ? "Something that\'s helped before:" : "Something that deepens this:";
     box.innerHTML =
-      '<p style="font-size:12px;color:var(--muted);margin:0 0 6px;">Something that\'s helped before:</p>' +
+      '<p style="font-size:12px;color:var(--muted);margin:0 0 6px;">' + label + '</p>' +
       '<img src="' + companion.counterPhoto + '" alt="counter photo" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;" />';
     box.style.display = "block";
   }
@@ -1290,6 +1307,8 @@ async function renderMoodsView(){
   grid.innerHTML = "";
   ALL_MOODS.forEach(mood=>{
     const c = byMood[mood] || {};
+    const needsShift = MOODS_NEEDING_SHIFT.has(mood);
+    const counterLabel = needsShift ? "What helps me shift" : "What deepens this";
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML =
@@ -1306,7 +1325,7 @@ async function renderMoodsView(){
           '</label>' +
         '</div>' +
         '<div style="flex:1;">' +
-          '<p style="font-size:11px;color:var(--muted);margin:0 0 4px;">What helps me shift</p>' +
+          '<p style="font-size:11px;color:var(--muted);margin:0 0 4px;">' + counterLabel + '</p>' +
           (c.counterPhoto
             ? '<img src="' + c.counterPhoto + '" style="width:100%;height:90px;object-fit:cover;border-radius:8px;" />'
             : '<div style="width:100%;height:90px;border-radius:8px;background:#f4f1ea;"></div>') +
