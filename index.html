@@ -338,6 +338,14 @@
 
     <div class="card">
       <h2>Nervous System Check-In</h2>
+      <p id="nsExplainerToggle" style="font-size:12px;color:var(--accent);font-weight:600;cursor:pointer;margin:0 0 10px;">New to this? What do these mean? &#8964;</p>
+      <div id="nsExplainerPanel" style="display:none;margin:0 0 14px;background:#f4f1ea;border-radius:10px;padding:12px;font-size:13px;line-height:1.5;color:var(--muted);">
+        <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟩 Settled</strong> &mdash; your body's "rest and connect" state. Heart calm, breathing easy, feeling safe enough to relax, be curious, or connect with others.</p>
+        <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟥 Fight-Flight</strong> &mdash; your body's alarm system gearing up for action. Heart racing, muscles tense, thoughts speeding up. This isn't just anger or panic &mdash; it also shows up as focused drive, excitement, or determination.</p>
+        <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟦 Freeze</strong> &mdash; your body's shutdown response, when fighting or fleeing doesn't feel possible. Low energy, foggy thinking, feeling distant or numb. It can also show up as deep rest, quiet stillness, or intentionally pulling back to recharge.</p>
+        <p style="margin:0;">There's no wrong answer here &mdash; these are just starting points to help you notice what's going on in your body right now.</p>
+        <p id="nsExplainerFoundationsLink" style="margin:10px 0 0;font-weight:600;color:var(--accent);cursor:pointer;">🌱 New to nervous system basics? Learn more in Foundations &rarr;</p>
+      </div>
       <div class="ns-buttons">
         <button class="ns-btn ventral" data-state="ventral">🟩 Settled</button>
         <button class="ns-btn sympathetic" data-state="sympathetic">🟥 Fight-Flight</button>
@@ -829,20 +837,20 @@ const NEED_FOCUS = {
 };
 
 const MOOD_DESCRIPTIONS = {
-  "Solitude": "Calm and alone, in a good way.",
-  "Joy": "Warm, connected, engaged with the moment or with others.",
-  "Focused Drive": "Energized and moving with purpose — activated, but not afraid.",
-  "Anxious Drive": "Activated by worry or urgency — keyed up, hard to settle.",
-  "Alarmed": "On high alert — bracing, unsafe, senses heightened.",
-  "On the Defense": "Guarded or defensive — ready to protect yourself.",
-  "Fired Up": "Excited, passionate, buzzing with enthusiasm.",
-  "Determined": "Gritty resolve — pushing through, locked in.",
-  "Rest and Digest": "Slowing down, recovering, restorative rest.",
-  "Immobility / Shut Down": "Numb, distant, or frozen — hard to feel much at all.",
-  "Numb": "Flat, muted, disconnected from your own feelings.",
-  "Foggy / Disconnected": "Hazy, unmoored, hard to think clearly or feel fully here.",
-  "Quiet Calm": "A gentle, easy stillness — restful without being heavy.",
-  "Withdrawn": "Pulled back on purpose — a chosen, protective retreat."
+  "Solitude": "A calm, easy kind of alone time — not lonely, just at peace with your own company. You might notice your shoulders drop or a quiet sense of contentment. Think: reading alone, a quiet walk, or just sitting with your own thoughts.",
+  "Joy": "A warm, open feeling — connected to the moment, to other people, or to something you enjoy. You might notice a smile, lightness in your chest, or wanting to share what you're feeling. Think: laughing with someone, a hobby you love, or just feeling good.",
+  "Focused Drive": "Activated energy that feels purposeful, not frantic — you're moving toward something rather than away from something. You might notice a clear head, steady momentum, or wanting to keep going. Think: deep work, exercise, or a project you care about.",
+  "Anxious Drive": "Your mind racing with worry or 'what ifs,' body keyed up and hard to settle. You might notice a racing heart, restless hands, or thoughts looping without landing. Think: before a big deadline, or when something feels unresolved.",
+  "Alarmed": "Your body's alarm bells ringing — on high alert, senses sharpened, bracing for something to happen. You might notice a jump at sudden sounds, a tight chest, or scanning your surroundings. Think: a sudden scare, or feeling caught off guard.",
+  "On the Defense": "A guarded, bristling feeling — like some part of you needs to protect a boundary or stand your ground. You might notice a clenched jaw, crossed arms, or a sharper tone. Think: feeling criticized, misunderstood, or pushed too far.",
+  "Fired Up": "A bright, excited charge — passionate, enthusiastic, buzzing with energy. You might notice talking faster, a grin you can't shake, or feeling lit up by an idea. Think: good news, an exciting plan, or something you're genuinely passionate about.",
+  "Determined": "A steady, gritty resolve — locked in and pushing through, even if it's hard. You might notice a set jaw, a one-foot-in-front-of-the-other feeling, or quiet stubbornness. Think: finishing something difficult, or refusing to give up.",
+  "Rest and Digest": "Genuine rest — your body slowing down on purpose, recovering rather than shutting down. You might notice heavy eyelids, a loosened body, or simply not wanting to do anything. Think: after a long day, or finally letting yourself stop.",
+  "Immobility / Shut Down": "A frozen, far-away feeling — like your system has hit pause. You might notice heaviness, trouble moving or deciding, or feeling far from your own body. This can happen after something overwhelming, or when there's been too much for too long.",
+  "Numb": "A flat, muted feeling — like the volume's been turned down on your emotions. You might notice going through the motions, or a sense of distance from yourself, even when you feel like you 'should' feel something. This can follow a stressful stretch.",
+  "Foggy / Disconnected": "A hazy, unmoored feeling — hard to think clearly, hard to feel fully present. You might notice spacing out, losing track of time, or feeling like you're floating just outside yourself. This can show up when you're overtired or overwhelmed.",
+  "Quiet Calm": "A gentle, easy stillness — restful without feeling heavy or low. You might notice slow breathing, relaxed shoulders, or a quiet sense of contentment. Think: a peaceful evening, or a moment where nothing needs to happen.",
+  "Withdrawn": "A chosen retreat — pulling back on purpose, not because something's wrong, but because you need space. You might notice wanting quiet, fewer words, or less contact than usual. Think: after a busy stretch of socializing, or just an introverted day."
 };
 
 const MOOD_COLORS = {
@@ -1908,6 +1916,22 @@ function wireEvents(){
   });
 
   document.getElementById("foundationsLink").addEventListener("click", ()=>{
+    document.querySelectorAll("nav.tabbar button").forEach(b=>b.classList.remove("active"));
+    document.querySelector('nav.tabbar button[data-view="foundations"]').classList.add("active");
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    document.getElementById("view-foundations").classList.add("active");
+  });
+
+  document.getElementById("nsExplainerToggle").addEventListener("click", ()=>{
+    const panel = document.getElementById("nsExplainerPanel");
+    const isOpen = panel.style.display === "block";
+    panel.style.display = isOpen ? "none" : "block";
+    document.getElementById("nsExplainerToggle").textContent = isOpen
+      ? "New to this? What do these mean? ⌄"
+      : "Hide explanation ⌃";
+  });
+
+  document.getElementById("nsExplainerFoundationsLink").addEventListener("click", ()=>{
     document.querySelectorAll("nav.tabbar button").forEach(b=>b.classList.remove("active"));
     document.querySelector('nav.tabbar button[data-view="foundations"]').classList.add("active");
     document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
