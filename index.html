@@ -740,6 +740,11 @@ const MOOD_AFFIRMATION = {
 
 const NEEDS = ["Connection","Grounding","Safety","Self-Compassion","Creativity","Autonomy","Beauty"];
 
+// For moods that don't need shifting (settled, and the energized/restful
+// moods that are easier to be with), the "regulatory" path becomes about
+// savoring and leaning into what's already going well — not calming down.
+const SAVOR_NEEDS = ["Connection","Creativity","Curiosity"];
+
 const NEED_FOCUS = {
   "Connection": [
     "Photograph something that reminds you you're not alone — a person, a message, a shared object.",
@@ -810,6 +815,16 @@ const NEED_FOCUS = {
     "Capture something whose imperfection is part of its beauty.",
     "Find something small and lovely nearby.",
     "Photograph something that makes you want to pause, even briefly."
+  ],
+  "Curiosity": [
+    "Photograph something you don't fully understand yet — an object, a mechanism, a pattern.",
+    "Find something you've walked past a hundred times and finally take a closer look.",
+    "Capture something you'd like to know more about.",
+    "Photograph an object as if you were seeing it for the very first time.",
+    "Find something with a story you don't know, and start wondering about it.",
+    "Capture a detail you've never noticed before, even somewhere familiar.",
+    "Photograph something that makes you want to look closer.",
+    "Find something unfamiliar nearby and get curious about what it is."
   ]
 };
 
@@ -1157,14 +1172,15 @@ function selectPromptType(type, container, btn){
   } else {
     box.style.display = "none";
     document.getElementById("needSection").style.display = "block";
-    populateNeedButtons();
+    const needsList = MOODS_NEEDING_SHIFT.has(selectedMood) ? NEEDS : SAVOR_NEEDS;
+    populateNeedButtons(needsList);
   }
 }
 
-function populateNeedButtons(){
+function populateNeedButtons(needsList){
   const container = document.getElementById("needButtons");
   container.innerHTML = "";
-  NEEDS.forEach(need=>{
+  (needsList || NEEDS).forEach(need=>{
     const btn = document.createElement("button");
     btn.className = "filter-chip";
     btn.textContent = need;
