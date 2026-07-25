@@ -101,7 +101,8 @@
     margin-top:10px;
     display:none;
     max-height:320px;
-    object-fit:cover;
+    object-fit:contain;
+    background:#f4f1ea;
   }
   .btn-row{
     display:flex;
@@ -197,11 +198,12 @@
     border-radius:10px;
     overflow:hidden;
     cursor:pointer;
+    background:#f4f1ea;
   }
   .gallery-item img{
     width:100%;
     height:100%;
-    object-fit:cover;
+    object-fit:contain;
     display:block;
   }
   .gallery-item .dot{
@@ -1344,7 +1346,7 @@ async function renderStoryStrip(){
     if(entry.photo){
       const img = document.createElement("img");
       img.src = entry.photo;
-      img.style.cssText = "width:76px;height:76px;object-fit:cover;border-radius:10px;display:block;";
+      img.style.cssText = "width:76px;height:76px;object-fit:contain;background:#f4f1ea;border-radius:10px;display:block;";
       item.appendChild(img);
     } else {
       const placeholder = document.createElement("div");
@@ -1532,7 +1534,7 @@ async function renderMoodCompanionBox(mood){
     const label = needsShift ? "Something that\'s helped before:" : "More of this feeling:";
     box.innerHTML =
       '<p style="font-size:12px;color:var(--muted);margin:0 0 6px;">' + label + '</p>' +
-      '<img src="' + companion.counterPhoto + '" alt="counter photo" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;" />';
+      '<img src="' + companion.counterPhoto + '" alt="counter photo" style="width:100%;max-height:220px;object-fit:contain;background:#f4f1ea;border-radius:10px;" />';
     box.style.display = "block";
   }
 }
@@ -1573,7 +1575,7 @@ async function renderMoodsView(){
         '<div style="flex:1;">' +
           '<p style="font-size:11px;color:var(--muted);margin:0 0 4px;">What it looks like</p>' +
           (c.statePhoto
-            ? '<img src="' + c.statePhoto + '" style="width:100%;height:90px;object-fit:cover;border-radius:8px;" />'
+            ? '<img src="' + c.statePhoto + '" style="width:100%;height:90px;object-fit:contain;background:#f4f1ea;border-radius:8px;" />'
             : '<div style="width:100%;height:90px;border-radius:8px;background:#f4f1ea;"></div>') +
           '<label class="btn" style="text-align:center;font-size:12px;margin-top:6px;display:block;">' +
             (c.statePhoto ? "Replace" : "Add") +
@@ -1583,7 +1585,7 @@ async function renderMoodsView(){
         '<div style="flex:1;">' +
           '<p style="font-size:11px;color:var(--muted);margin:0 0 4px;">' + counterLabel + '</p>' +
           (c.counterPhoto
-            ? '<img src="' + c.counterPhoto + '" style="width:100%;height:90px;object-fit:cover;border-radius:8px;" />'
+            ? '<img src="' + c.counterPhoto + '" style="width:100%;height:90px;object-fit:contain;background:#f4f1ea;border-radius:8px;" />'
             : '<div style="width:100%;height:90px;border-radius:8px;background:#f4f1ea;"></div>') +
           '<label class="btn" style="text-align:center;font-size:12px;margin-top:6px;display:block;">' +
             (c.counterPhoto ? "Replace" : "Add") +
@@ -1788,7 +1790,7 @@ async function renderFoundationsSavedList(lessonIndex, listEl){
     const wrap = document.createElement("div");
     wrap.style.cssText = "position:relative;";
     wrap.innerHTML =
-      '<img src="' + p.photo + '" style="width:70px;height:70px;object-fit:cover;border-radius:8px;display:block;" />' +
+      '<img src="' + p.photo + '" style="width:70px;height:70px;object-fit:contain;background:#f4f1ea;border-radius:8px;display:block;" />' +
       '<button data-photo-id="' + p.id + '" class="fpDeleteBtn" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:none;background:#a83246;color:#fff;font-size:12px;line-height:1;cursor:pointer;">×</button>';
     listEl.appendChild(wrap);
   });
@@ -1862,7 +1864,7 @@ async function renderFoundationsRenameGallery(container){
     const row = document.createElement("div");
     row.style.cssText = "display:flex;gap:10px;align-items:flex-start;margin-top:12px;";
     row.innerHTML =
-      '<img src="' + p.photo + '" style="width:64px;height:64px;object-fit:cover;border-radius:8px;flex-shrink:0;" />' +
+      '<img src="' + p.photo + '" style="width:64px;height:64px;object-fit:contain;background:#f4f1ea;border-radius:8px;flex-shrink:0;" />' +
       '<div style="flex:1;">' +
         (p.title ? '<p style="font-size:11px;color:var(--muted);margin:0 0 4px;">Was: ' + p.title + '</p>' : '') +
         '<input type="text" class="fpRenameInput" data-photo-id="' + p.id + '" placeholder="e.g. I look forward to the sun after the rain" value="' + (p.newTitle || "") + '" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:13px;box-sizing:border-box;" />' +
