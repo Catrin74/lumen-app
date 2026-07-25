@@ -761,7 +761,7 @@ const SAVOR_NEEDS = ["Connection","Creativity","Curiosity"];
 // movement, Levine's orienting response, warmth, and micro-connection for
 // freeze) and translated into photographable prompts.
 const SHIFT_NEEDS_SYMPATHETIC = ["Breath","Grounding","Movement","Cool Down"];
-const SHIFT_NEEDS_DORSAL = ["Warmth","Orienting","Gentle Movement","Connection","Nature"];
+const SHIFT_NEEDS_DORSAL = ["Warmth","Orienting","Gentle Movement","Gentle Connection","Nature"];
 
 const NEED_FOCUS = {
   "Connection": [
@@ -853,6 +853,22 @@ const NEED_FOCUS = {
     "Photograph an animal, even in a photo or on a screen, if none are nearby right now.",
     "Find something alive that isn't a person — a plant, an insect, a pet — and give it your attention.",
     "Photograph a leaf, feather, shell, or anything nature left behind."
+  ],
+  // A lower-effort version of Connection for the freeze/shutdown path.
+  // Regular "Connection" asks people to recall a relationship or place of
+  // closeness — fine when someone's resourced, but it can backfire in
+  // shutdown, where recall takes energy that isn't there and can surface
+  // loneliness or loss instead of safety. These stay in the present moment
+  // and don't require thinking of a specific person.
+  "Gentle Connection": [
+    "Photograph a pet, or any animal you can see or hear right now.",
+    "Find something nearby that was made, chosen, or touched by someone else, and just notice it — no need to think about who.",
+    "Photograph a window, doorway, or anything that connects your space to the world outside.",
+    "Capture something ordinary that other people also have or use — a mug, a chair, a street.",
+    "Find a photo, object, or message already nearby, and simply notice that it came from someone else.",
+    "Photograph something soft enough to hold against you for a moment.",
+    "Notice a sound nearby that reminds you other life is happening around you — traffic, birds, voices — and photograph its source.",
+    "Photograph something that doesn't ask anything of you, but is still there with you."
   ],
   "Safety": [
     "Photograph something that feels protective or safe — a boundary, a shelter, a familiar space.",
