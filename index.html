@@ -753,6 +753,16 @@ const NEEDS = ["Connection","Grounding","Safety","Self-Compassion","Creativity",
 // savoring and leaning into what's already going well — not calming down.
 const SAVOR_NEEDS = ["Connection","Creativity","Curiosity"];
 
+// Fight-flight (sympathetic) and freeze (dorsal) call for opposite kinds of
+// help — hyperarousal needs to discharge and settle, hypoarousal needs to
+// gently re-engage and warm up. These sets are drawn from evidence-based
+// techniques (extended-exhale breathing, cold-water diving reflex, rhythmic
+// movement, and 5-4-3-2-1 grounding for fight-flight; titrated small
+// movement, Levine's orienting response, warmth, and micro-connection for
+// freeze) and translated into photographable prompts.
+const SHIFT_NEEDS_SYMPATHETIC = ["Breath","Grounding","Movement","Cool Down"];
+const SHIFT_NEEDS_DORSAL = ["Warmth","Orienting","Gentle Movement","Connection"];
+
 const NEED_FOCUS = {
   "Connection": [
     "Photograph something that reminds you you're not alone — a person, a message, a shared object.",
@@ -773,6 +783,66 @@ const NEED_FOCUS = {
     "Capture your own hands, feet, or something touching your body right now.",
     "Find something with clear, defined edges.",
     "Photograph something ordinary that's stayed exactly the same for years — a doorframe, a mug, a chair."
+  ],
+  "Breath": [
+    "Breathe in through your nose, then let a long, slow breath out through your mouth. Photograph whatever you're looking at when the breath ends.",
+    "Photograph something that moves slowly — steam, smoke, a curtain, a breath fogging a window.",
+    "Take three slow breaths, then capture the first thing your eyes land on.",
+    "Photograph something that expands and contracts — a balloon, a rising chest, a wave.",
+    "Find something that seems to be exhaling — steam from a cup, air through a window, wind in leaves.",
+    "Capture the stillness right after a long exhale — yours, or something around you.",
+    "Photograph the pause between one breath and the next.",
+    "Find something that reminds you that you're allowed to slow down."
+  ],
+  "Movement": [
+    "Take a short walk, even just around the room, then photograph wherever you end up.",
+    "Photograph something in motion — traffic, a swinging branch, someone walking.",
+    "Shake out your hands for a few seconds, then capture the first thing that catches your eye.",
+    "Photograph your own footsteps or the path you just walked.",
+    "Find a rhythm nearby — a clock, dripping water, footsteps — and photograph its source.",
+    "Move your body for a moment first — stretch, pace, sway — then take the photo.",
+    "Photograph something that had to travel to get here — mail, a gift, something carried.",
+    "Let the camera move as you shoot, just once, and see what you catch."
+  ],
+  "Cool Down": [
+    "Photograph something cold — ice, a cold drink, a window with condensation.",
+    "Run cool water over your wrists for a moment, then photograph what's in front of you.",
+    "Find something blue or icy-toned and capture it.",
+    "Photograph water — a tap, a glass, anything that feels cool or clear.",
+    "Step near an open window or outside for a breath of cooler air, then take the photo.",
+    "Capture something smooth and cool to the touch.",
+    "Photograph something with a cool color palette — blues, greens, greys.",
+    "Find shade or a cooler spot nearby and capture what's there."
+  ],
+  "Warmth": [
+    "Photograph something warm within reach — a blanket, a drink, a patch of sun.",
+    "Find a source of light or warmth nearby and capture it.",
+    "Photograph something soft you could wrap yourself in.",
+    "Capture a warm color — amber, orange, gold — wherever you can find it.",
+    "Find a source of gentle heat — sunlight, a lamp, a heater — and photograph how it falls.",
+    "Photograph a cup of something warm, even if it's not yours.",
+    "Photograph a candle, fire, or any small flicker of warmth.",
+    "Capture something that reminds you of comfort — a mug, a sweater, a favorite spot."
+  ],
+  "Orienting": [
+    "Slowly look around the room. Photograph the first neutral, ordinary thing you notice.",
+    "Name five things you can see without moving, then photograph one of them.",
+    "Photograph something solid and unmoving nearby — furniture, a wall, a doorframe.",
+    "Look for something familiar in your surroundings and capture it.",
+    "Photograph whatever is directly in front of you right now, exactly as it is.",
+    "Find something with a clear shape or edge and let your eyes rest on it before capturing it.",
+    "Photograph the view exactly as it is from where you're sitting or standing.",
+    "Find three ordinary objects nearby and photograph the one that feels most familiar."
+  ],
+  "Gentle Movement": [
+    "Wiggle your fingers or toes for a moment, then photograph whatever is nearest to your hand.",
+    "Make one small, slow movement — turn your head, shift your weight — then capture what you see.",
+    "Photograph something small enough to hold in one hand.",
+    "Take one small step toward something that interests you, then photograph it.",
+    "Stretch gently for a few seconds, then take the photo without rushing.",
+    "Photograph something within arm's reach, without needing to get up.",
+    "Photograph something you can touch without needing to move far.",
+    "Notice one small sensation in your body, then photograph whatever is nearby."
   ],
   "Safety": [
     "Photograph something that feels protective or safe — a boundary, a shelter, a familiar space.",
@@ -1180,7 +1250,16 @@ function selectPromptType(type, container, btn){
   } else {
     box.style.display = "none";
     document.getElementById("needSection").style.display = "block";
-    const needsList = MOODS_NEEDING_SHIFT.has(selectedMood) ? NEEDS : SAVOR_NEEDS;
+    let needsList;
+    if(!MOODS_NEEDING_SHIFT.has(selectedMood)){
+      needsList = SAVOR_NEEDS;
+    } else if(selectedState === "sympathetic"){
+      needsList = SHIFT_NEEDS_SYMPATHETIC;
+    } else if(selectedState === "dorsal"){
+      needsList = SHIFT_NEEDS_DORSAL;
+    } else {
+      needsList = NEEDS;
+    }
     populateNeedButtons(needsList);
   }
 }
