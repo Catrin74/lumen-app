@@ -325,7 +325,8 @@
     <div class="card">
       <h2>Your Story So Far</h2>
       <p id="storyCount" style="font-size:13px;color:var(--muted);margin:0 0 10px;">Your story starts with your first photo.</p>
-      <div id="storyStrip" style="display:none;gap:8px;overflow-x:auto;padding-bottom:2px;"></div>
+      <div id="storyStrip" style="display:none;gap:10px;overflow-x:auto;padding-bottom:4px;"></div>
+      <p id="viewFullJourney" style="display:none;font-size:12px;color:var(--accent);font-weight:600;cursor:pointer;margin:8px 0 0;">View full journey &rarr;</p>
     </div>
 
     <div class="card" style="text-align:center;">
@@ -347,14 +348,8 @@
     </div>
 
     <div class="card" id="todayPracticeCard" style="display:none;">
-      <span id="practiceCategory" style="display:inline-block;font-size:11px;font-weight:600;color:var(--accent);background:#f4f1ea;padding:3px 9px;border-radius:20px;margin-bottom:8px;"></span>
-      <p class="prompt-text" id="quickPromptText" style="margin:0 0 8px;"></p>
-      <p id="quickAffirmation" style="font-size:12px;font-style:italic;color:var(--accent);margin:0 0 10px;"></p>
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span id="shuffleBtn" style="font-size:12px;color:var(--muted);cursor:pointer;">Show me another &#8635;</span>
-        <button id="deeperToggleBtn" style="background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;padding:0;">Go deeper &#8964;</button>
-      </div>
-      <div id="deeperPanel" style="display:none; margin-top:12px; border-top:1px solid #eee; padding-top:12px;">
+      <h2>Today's Practice</h2>
+      <div id="deeperPanel">
         <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">Which of these feels closest?</p>
         <div id="moodButtons" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
         <div id="promptTypeSection" style="display:none;margin-top:14px;">
@@ -511,61 +506,6 @@ const STATE_COLORS = {
   sympathetic:"#e0584f",
   dorsal:"#4a7ab5",
   ventral:"#3fa793"
-};
-
-// One unified prompt per state, replacing the old separate "Today's Prompt"
-// + deep mood/need system as the default view. Categorized so the kind of
-// practice being offered is visible at a glance. "Go deeper" still reaches
-// the fuller mood/need flow for anyone who wants it.
-const QUICK_PROMPTS = {
-  ventral: [
-    { category: "Regulation", text: "Capture this feeling exactly as it is, before it passes." },
-    { category: "Regulation", text: "Photograph whatever is keeping you steady right now." },
-    { category: "Perspective", text: "Look at something ordinary nearby as if you'd never seen it before — what do you notice now?" },
-    { category: "Perspective", text: "Find an object and photograph it from an angle you've never tried." },
-    { category: "Nature", text: "Step outside for a moment and photograph the first natural thing that catches your eye." },
-    { category: "Nature", text: "Find a small pattern in nature — a leaf vein, a ripple, a cluster — and capture it closely." },
-    { category: "Compassion", text: "Photograph something you'd want to remember on a harder day." },
-    { category: "Compassion", text: "Capture a small kindness you noticed today, given or received." }
-  ],
-  sympathetic: [
-    { category: "Regulation", text: "Photograph something holding still, even if you're not." },
-    { category: "Regulation", text: "Find a clear edge or boundary nearby and let your eyes rest on it before you shoot." },
-    { category: "Perspective", text: "Photograph the same object twice — once fast, once as slowly as you can manage." },
-    { category: "Perspective", text: "Notice one assumption you're making right now, then photograph something that quietly contradicts it." },
-    { category: "Nature", text: "Find something green nearby, even a single leaf, and give it your full attention before capturing it." },
-    { category: "Nature", text: "Photograph water if you can find it — a glass, a tap, a puddle — anything that moves or settles." },
-    { category: "Compassion", text: "Photograph something you'd hand to a friend who was as wound up as you feel right now." },
-    { category: "Compassion", text: "Capture something soft — you're allowed a moment of gentleness in the middle of this." }
-  ],
-  dorsal: [
-    { category: "Regulation", text: "Photograph a small patch of warmth or light nearby." },
-    { category: "Regulation", text: "Find one sign of life — a plant, a person, movement of any kind — and capture it." },
-    { category: "Perspective", text: "Photograph something from very close up, closer than feels natural." },
-    { category: "Perspective", text: "Notice one color in the room and photograph everything you can find that shares it." },
-    { category: "Nature", text: "If you can get outside, photograph the sky exactly as it looks right now." },
-    { category: "Nature", text: "Find something rooted and still — a tree, a stone — and capture it." },
-    { category: "Compassion", text: "Photograph something that doesn't ask anything of you right now." },
-    { category: "Compassion", text: "Capture a small comfort within reach — a blanket, a drink, a familiar object." }
-  ]
-};
-
-const STATE_AFFIRMATIONS = {
-  ventral: [
-    "This ease is allowed to just be ease.",
-    "You don't have to do anything with this feeling except notice it.",
-    "Let this moment be enough."
-  ],
-  sympathetic: [
-    "You're allowed to feel activated without it being an emergency.",
-    "This energy doesn't have to be fixed right now — just noticed.",
-    "You can be quick and still be safe."
-  ],
-  dorsal: [
-    "It's okay to move slowly, or not at all, right now.",
-    "Rest isn't something you need to earn.",
-    "You're still here, even when it feels far away."
-  ]
 };
 
 /* ---------- Foundations: a one-time, self-paced introduction to mindful
@@ -1124,8 +1064,6 @@ function resetDeeperPanel(){
   document.getElementById("tailoredPromptBox").textContent = "";
   document.getElementById("moodCompanionBox").style.display = "none";
   document.getElementById("moodCompanionBox").innerHTML = "";
-  document.getElementById("deeperPanel").style.display = "none";
-  document.getElementById("deeperToggleBtn").textContent = "Go deeper ⌄";
 }
 
 let moodHintElements = {}; // mood name -> its group's hint <p> element
@@ -1245,12 +1183,6 @@ function selectNeed(need, container, btn){
 function renderTodayPractice(state){
   const card = document.getElementById("todayPracticeCard");
   card.style.display = "block";
-  const options = QUICK_PROMPTS[state];
-  const pick = options[Math.floor(Math.random() * options.length)];
-  document.getElementById("practiceCategory").textContent = pick.category;
-  document.getElementById("quickPromptText").textContent = pick.text;
-  document.getElementById("quickAffirmation").textContent = pickRandom(STATE_AFFIRMATIONS[state]);
-  activePromptText = pick.text;
   resetDeeperPanel();
   populateMoodButtons(state);
 }
@@ -1265,17 +1197,39 @@ async function renderStoryStrip(){
     : "Your story starts with your first photo.";
   const recent = entries.slice(-8).reverse();
   strip.innerHTML = "";
+  const viewLink = document.getElementById("viewFullJourney");
   if(!recent.length){
     strip.style.display = "none";
+    if(viewLink) viewLink.style.display = "none";
     return;
   }
   strip.style.display = "flex";
-  strip.style.cursor = "pointer";
+  if(viewLink) viewLink.style.display = entries.length > 8 ? "block" : "none";
   recent.forEach(entry=>{
-    const img = document.createElement("img");
-    img.src = entry.photo;
-    img.style.cssText = "width:64px;height:64px;object-fit:cover;border-radius:10px;flex-shrink:0;";
-    strip.appendChild(img);
+    const item = document.createElement("div");
+    item.style.cssText = "width:76px;flex-shrink:0;cursor:pointer;";
+
+    if(entry.photo){
+      const img = document.createElement("img");
+      img.src = entry.photo;
+      img.style.cssText = "width:76px;height:76px;object-fit:cover;border-radius:10px;display:block;";
+      item.appendChild(img);
+    } else {
+      const placeholder = document.createElement("div");
+      placeholder.style.cssText = "width:76px;height:76px;border-radius:10px;background:#f4f1ea;display:flex;align-items:center;justify-content:center;font-size:20px;";
+      placeholder.textContent = "📝";
+      item.appendChild(placeholder);
+    }
+
+    if(entry.caption){
+      const cap = document.createElement("p");
+      cap.textContent = entry.caption;
+      cap.style.cssText = "font-size:11px;color:var(--muted);margin:4px 0 0;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;";
+      item.appendChild(cap);
+    }
+
+    item.addEventListener("click", ()=>openModal(entry));
+    strip.appendChild(item);
   });
 }
 
@@ -1869,20 +1823,9 @@ function wireEvents(){
     });
   });
 
-  document.getElementById("shuffleBtn").addEventListener("click", ()=>{
-    if(selectedState) renderTodayPractice(selectedState);
-  });
-
   const promptTypeContainer = document.getElementById("promptTypeButtons");
   Array.from(promptTypeContainer.children).forEach(btn=>{
     btn.addEventListener("click", ()=>selectPromptType(btn.dataset.type, promptTypeContainer, btn));
-  });
-
-  document.getElementById("deeperToggleBtn").addEventListener("click", ()=>{
-    const panel = document.getElementById("deeperPanel");
-    const isOpen = panel.style.display === "block";
-    panel.style.display = isOpen ? "none" : "block";
-    document.getElementById("deeperToggleBtn").textContent = isOpen ? "Go deeper ⌄" : "Hide ⌃";
   });
 
   document.getElementById("photoInput").addEventListener("change", (e)=>{
@@ -1931,7 +1874,7 @@ function wireEvents(){
 
   document.getElementById("notifBtn").addEventListener("click", enableReminders);
 
-  document.getElementById("storyStrip").addEventListener("click", ()=>{
+  document.getElementById("viewFullJourney").addEventListener("click", ()=>{
     document.querySelectorAll("nav.tabbar button").forEach(b=>b.classList.remove("active"));
     document.querySelector('nav.tabbar button[data-view="gallery"]').classList.add("active");
     document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
