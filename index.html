@@ -398,7 +398,8 @@
         <button class="btn" id="glimmerCta">✨ Show me a Glimmer</button>
       </div>
       <img id="preview" class="capture-preview" alt="preview" />
-      <textarea id="caption" placeholder="A brief reflection or caption (optional)&hellip;"></textarea>
+      <p id="reflectionPrompt" style="font-size:13px;color:var(--accent);font-weight:600;margin:10px 0 6px;"></p>
+      <textarea id="caption" placeholder="Write a word or two&hellip; (optional)"></textarea>
       <label class="glimmer-toggle">
         <input type="checkbox" id="glimmerTag" />
         Mark this as a Glimmer (a small moment of light or peace)
@@ -1125,8 +1126,8 @@ const REFLECTION_HELPERS = [
 
 function setActivePrompt(text){
   activePromptText = text;
-  const caption = document.getElementById("caption");
-  if(caption) caption.placeholder = pickRandom(REFLECTION_HELPERS);
+  const reflectionPrompt = document.getElementById("reflectionPrompt");
+  if(reflectionPrompt) reflectionPrompt.textContent = pickRandom(REFLECTION_HELPERS);
 }
 
 function populateAnchorCategoryButtons(){
