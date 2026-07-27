@@ -338,43 +338,53 @@
       <p style="font-size:14px;color:var(--muted);margin:0;">Close your eyes for a moment. Notice how you feel right now &mdash; before anything else.</p>
     </div>
 
-    <div class="card">
-      <h2>Nervous System Check-In</h2>
-      <p id="nsExplainerToggle" style="font-size:12px;color:var(--accent);font-weight:600;cursor:pointer;margin:0 0 10px;">New to this? What do these mean? &#8964;</p>
-      <div id="nsExplainerPanel" style="display:none;margin:0 0 14px;background:#f4f1ea;border-radius:10px;padding:12px;font-size:13px;line-height:1.5;color:var(--muted);">
-        <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟩 Settled</strong> &mdash; your body's "rest and connect" state. Heart calm, breathing easy, feeling safe enough to relax, be curious, or connect with others.</p>
-        <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟥 Fight-Flight</strong> &mdash; your body's alarm system gearing up for action. Heart racing, muscles tense, thoughts speeding up. This isn't just anger or panic &mdash; it also shows up as focused drive, excitement, or determination.</p>
-        <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟦 Freeze</strong> &mdash; your body's shutdown response, when fighting or fleeing doesn't feel possible. Low energy, foggy thinking, feeling distant or numb. It can also show up as deep rest, quiet stillness, or intentionally pulling back to recharge.</p>
-        <p style="margin:0;">There's no wrong answer here &mdash; these are just starting points to help you notice what's going on in your body right now.</p>
-        <p id="nsExplainerFoundationsLink" style="margin:10px 0 0;font-weight:600;color:var(--accent);cursor:pointer;">🌱 New to nervous system basics? Learn more in Foundations &rarr;</p>
-      </div>
-      <div class="ns-buttons">
-        <button class="ns-btn ventral" data-state="ventral">🟩 Settled</button>
-        <button class="ns-btn sympathetic" data-state="sympathetic">🟥 Fight-Flight</button>
-        <button class="ns-btn dorsal" data-state="dorsal">🟦 Freeze</button>
-      </div>
-      <p class="ns-hint" id="nsHint">Notice how you're feeling right now &mdash; there's no wrong answer.</p>
-      <p id="anchorLink" style="display:none;font-size:13px;color:var(--accent);font-weight:600;cursor:pointer;margin-top:6px;">⚓ Need something steady? View your anchors</p>
-    </div>
-
-    <div class="card" id="todayPracticeCard" style="display:none;">
+    <div class="card" id="todayPracticeCard">
       <h2>Today's Practice</h2>
-      <div id="deeperPanel">
-        <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">Which of these feels closest?</p>
-        <div id="moodButtons" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
-        <div id="promptTypeSection" style="display:none;margin-top:14px;">
-          <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">Would you like to&hellip;</p>
-          <div id="promptTypeButtons" style="display:flex;flex-wrap:wrap;gap:8px;">
-            <button class="filter-chip" data-type="reflective">I just notice how I feel</button>
-            <button class="filter-chip" data-type="regulatory" id="regulatoryBtn">Find something to help me shift</button>
+
+      <div id="generalPromptRow">
+        <p class="prompt-text" id="generalPromptText" style="margin:0 0 10px;"></p>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span id="shuffleGeneralBtn" style="font-size:12px;color:var(--muted);cursor:pointer;">Show me another &#8635;</span>
+          <span id="checkInToggle" style="font-size:12px;color:var(--accent);font-weight:600;cursor:pointer;">Check in with how you're feeling &rarr;</span>
+        </div>
+      </div>
+
+      <div id="checkInPanel" style="display:none;">
+        <p id="backToGeneralPrompt" style="font-size:12px;color:var(--muted);font-weight:600;cursor:pointer;margin:0 0 12px;">&larr; Back to today's prompt</p>
+
+        <p id="nsExplainerToggle" style="font-size:12px;color:var(--accent);font-weight:600;cursor:pointer;margin:0 0 10px;">New to this? What do these mean? &#8964;</p>
+        <div id="nsExplainerPanel" style="display:none;margin:0 0 14px;background:#f4f1ea;border-radius:10px;padding:12px;font-size:13px;line-height:1.5;color:var(--muted);">
+          <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟩 Settled</strong> &mdash; your body's "rest and connect" state. Heart calm, breathing easy, feeling safe enough to relax, be curious, or connect with others.</p>
+          <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟥 Fight-Flight</strong> &mdash; your body's alarm system gearing up for action. Heart racing, muscles tense, thoughts speeding up. This isn't just anger or panic &mdash; it also shows up as focused drive, excitement, or determination.</p>
+          <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟦 Freeze</strong> &mdash; your body's shutdown response, when fighting or fleeing doesn't feel possible. Low energy, foggy thinking, feeling distant or numb. It can also show up as deep rest, quiet stillness, or intentionally pulling back to recharge.</p>
+          <p style="margin:0;">There's no wrong answer here &mdash; these are just starting points to help you notice what's going on in your body right now.</p>
+          <p id="nsExplainerFoundationsLink" style="margin:10px 0 0;font-weight:600;color:var(--accent);cursor:pointer;">🌱 New to nervous system basics? Learn more in Foundations &rarr;</p>
+        </div>
+        <div class="ns-buttons">
+          <button class="ns-btn ventral" data-state="ventral">🟩 Settled</button>
+          <button class="ns-btn sympathetic" data-state="sympathetic">🟥 Fight-Flight</button>
+          <button class="ns-btn dorsal" data-state="dorsal">🟦 Freeze</button>
+        </div>
+        <p class="ns-hint" id="nsHint">Notice how you're feeling right now &mdash; there's no wrong answer.</p>
+        <p id="anchorLink" style="display:none;font-size:13px;color:var(--accent);font-weight:600;cursor:pointer;margin-top:6px;">⚓ Need something steady? View your anchors</p>
+
+        <div id="deeperPanel" style="margin-top:14px;border-top:1px solid #eee;padding-top:12px;">
+          <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">Which of these feels closest?</p>
+          <div id="moodButtons" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+          <div id="promptTypeSection" style="display:none;margin-top:14px;">
+            <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">Would you like to&hellip;</p>
+            <div id="promptTypeButtons" style="display:flex;flex-wrap:wrap;gap:8px;">
+              <button class="filter-chip" data-type="reflective">I just notice how I feel</button>
+              <button class="filter-chip" data-type="regulatory" id="regulatoryBtn">Find something to help me shift</button>
+            </div>
           </div>
+          <div id="needSection" style="display:none;margin-top:14px;">
+            <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">What do you need most right now?</p>
+            <div id="needButtons" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+          </div>
+          <div id="tailoredPromptBox" style="display:none;margin-top:14px;background:#f4f1ea;border-radius:10px;padding:12px;font-size:14px;line-height:1.4;"></div>
+          <div id="moodCompanionBox" style="display:none;margin-top:14px;border-top:1px solid #eee;padding-top:12px;"></div>
         </div>
-        <div id="needSection" style="display:none;margin-top:14px;">
-          <p style="font-size:12px;color:var(--muted);margin:0 0 8px;">What do you need most right now?</p>
-          <div id="needButtons" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
-        </div>
-        <div id="tailoredPromptBox" style="display:none;margin-top:14px;background:#f4f1ea;border-radius:10px;padding:12px;font-size:14px;line-height:1.4;"></div>
-        <div id="moodCompanionBox" style="display:none;margin-top:14px;border-top:1px solid #eee;padding-top:12px;"></div>
       </div>
     </div>
 
@@ -494,6 +504,30 @@
 
 <script>
 /* ---------- Data: prompts & content ---------- */
+
+// The default, no-decision-required prompt shown the moment the app opens.
+// Checking in with a nervous-system state is optional and available via
+// "Check in with how you're feeling" — this keeps the everyday loop to
+// just "read a prompt, take a photo" for anyone who doesn't want to do a
+// mood assessment first.
+const GENERAL_PROMPTS = [
+  "Photograph the light in the room you're in right now, exactly as it falls.",
+  "Find something soft nearby and capture its texture up close.",
+  "Photograph something that's been in the same place for a long time.",
+  "Capture a shadow you'd normally walk past.",
+  "Find a small pattern in nature — a leaf vein, a ripple, a cluster — and capture it closely.",
+  "Photograph the view from exactly where you're sitting or standing.",
+  "Capture a color that feels good to you today.",
+  "Find something small that's easy to overlook. Give it your full attention.",
+  "Photograph something you're grateful for today, however small.",
+  "Capture something that makes you want to slow down.",
+  "Find a reflection — in glass, water, metal, or a screen.",
+  "Photograph a corner of your space you rarely notice.",
+  "Capture something that feels playful, even briefly.",
+  "Photograph something you'd want to remember on an ordinary day.",
+  "Find an object and photograph it from an angle you've never tried.",
+  "Capture whatever is directly in front of you right now, exactly as it is."
+];
 
 const STATE_PROMPTS = {
   sympathetic: "Fight-Flight — heart up, thoughts quick, hard to settle, energy with nowhere to go, like water starting to steam. Try photographing something with stillness in motion, or a clear edge or boundary to rest your attention on.",
@@ -1315,10 +1349,24 @@ function selectNeed(need, container, btn){
 }
 
 function renderTodayPractice(state){
-  const card = document.getElementById("todayPracticeCard");
-  card.style.display = "block";
   resetDeeperPanel();
   populateMoodButtons(state);
+}
+
+// Default view: one ready-to-use prompt, no check-in required. Checking in
+// is reached via the "Check in with how you're feeling" link and can be
+// backed out of again without losing the option to just take the photo.
+function showGeneralPrompt(){
+  const prompt = pickRandom(GENERAL_PROMPTS);
+  document.getElementById("generalPromptText").textContent = prompt;
+  activePromptText = prompt;
+  document.getElementById("generalPromptRow").style.display = "block";
+  document.getElementById("checkInPanel").style.display = "none";
+  document.querySelectorAll(".ns-btn").forEach(b=>b.classList.remove("selected"));
+  selectedState = null;
+  document.getElementById("nsHint").textContent = "Notice how you're feeling right now — there's no wrong answer.";
+  document.getElementById("anchorLink").style.display = "none";
+  resetDeeperPanel();
 }
 
 async function renderStoryStrip(){
@@ -1930,6 +1978,7 @@ async function init(){
 
   renderGallery(entries);
   renderStoryStrip();
+  showGeneralPrompt();
   wireEvents();
   checkNotifStatus();
   populateAnchorCategoryButtons();
@@ -1942,6 +1991,21 @@ async function init(){
 /* ---------- Nervous system check-in ---------- */
 
 function wireEvents(){
+
+  document.getElementById("shuffleGeneralBtn").addEventListener("click", ()=>{
+    const prompt = pickRandom(GENERAL_PROMPTS);
+    document.getElementById("generalPromptText").textContent = prompt;
+    activePromptText = prompt;
+  });
+
+  document.getElementById("checkInToggle").addEventListener("click", ()=>{
+    document.getElementById("generalPromptRow").style.display = "none";
+    document.getElementById("checkInPanel").style.display = "block";
+  });
+
+  document.getElementById("backToGeneralPrompt").addEventListener("click", ()=>{
+    showGeneralPrompt();
+  });
 
   document.querySelectorAll(".ns-btn").forEach(btn=>{
     btn.addEventListener("click", ()=>{
@@ -2122,12 +2186,7 @@ async function saveEntry(){
   delete img.dataset.dataurl;
   document.getElementById("caption").value = "";
   document.getElementById("glimmerTag").checked = false;
-  document.querySelectorAll(".ns-btn").forEach(b=>b.classList.remove("selected"));
-  selectedState = null;
-  document.getElementById("todayPracticeCard").style.display = "none";
-  resetDeeperPanel();
-  document.getElementById("nsHint").textContent = "Notice how you're feeling right now — there's no wrong answer.";
-  activePromptText = "";
+  showGeneralPrompt();
 
   const entries = await getAllEntries();
   currentEntryCount = entries.length;
