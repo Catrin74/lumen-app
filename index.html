@@ -1111,6 +1111,24 @@ let selectedPromptType = null;
 let selectedAnchorCategory = null;
 let activePromptText = "";
 
+// Short reflective questions shown as the caption placeholder once a photo
+// prompt is active, so the blank "write something" box has an easy way in
+// instead of a generic "optional caption" hint.
+const REFLECTION_HELPERS = [
+  "What made you want to capture this?",
+  "What do you notice, looking at it now?",
+  "How does this connect to how you're feeling?",
+  "What's one word for what this feels like?",
+  "What would you want to remember about this moment?",
+  "What surprised you about it?"
+];
+
+function setActivePrompt(text){
+  activePromptText = text;
+  const caption = document.getElementById("caption");
+  if(caption) caption.placeholder = pickRandom(REFLECTION_HELPERS);
+}
+
 function populateAnchorCategoryButtons(){
   const container = document.getElementById("anchorCategoryButtons");
   if(!container || container.children.length) return; // already populated once
@@ -1307,7 +1325,7 @@ function selectPromptType(type, container, btn){
     document.getElementById("needSection").style.display = "none";
     selectedNeed = null;
     box.textContent = pickRandom(REFLECTIVE_PROMPTS[selectedMood]);
-    activePromptText = box.textContent;
+    setActivePrompt(box.textContent);
     box.style.display = "block";
   } else {
     box.style.display = "none";
@@ -1344,7 +1362,7 @@ function selectNeed(need, container, btn){
   btn.classList.add("active");
   const box = document.getElementById("tailoredPromptBox");
   box.textContent = pickRandom(MOOD_FRAME[selectedMood]) + " " + pickRandom(NEED_FOCUS[need]);
-  activePromptText = box.textContent;
+  setActivePrompt(box.textContent);
   box.style.display = "block";
 }
 
@@ -1359,7 +1377,7 @@ function renderTodayPractice(state){
 function showGeneralPrompt(){
   const prompt = pickRandom(GENERAL_PROMPTS);
   document.getElementById("generalPromptText").textContent = prompt;
-  activePromptText = prompt;
+  setActivePrompt(prompt);
   document.getElementById("generalPromptRow").style.display = "block";
   document.getElementById("checkInPanel").style.display = "none";
   document.querySelectorAll(".ns-btn").forEach(b=>b.classList.remove("selected"));
@@ -1377,7 +1395,8 @@ async function renderStoryStrip(){
   countLabel.textContent = entries.length
     ? `${entries.length} moment${entries.length===1?"":"s"} in your story so far.`
     : "Your story starts with your first photo.";
-  const recent = entries.slice(-8).reverse();
+  // getAllEntries() already returns newest-first, so just take the first 8.
+  const recent = entries.slice(0, 8);
   strip.innerHTML = "";
   const viewLink = document.getElementById("viewFullJourney");
   if(!recent.length){
@@ -1995,7 +2014,7 @@ function wireEvents(){
   document.getElementById("shuffleGeneralBtn").addEventListener("click", ()=>{
     const prompt = pickRandom(GENERAL_PROMPTS);
     document.getElementById("generalPromptText").textContent = prompt;
-    activePromptText = prompt;
+    setActivePrompt(prompt);
   });
 
   document.getElementById("checkInToggle").addEventListener("click", ()=>{
