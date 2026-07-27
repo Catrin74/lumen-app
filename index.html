@@ -354,16 +354,16 @@
 
         <p id="nsExplainerToggle" style="font-size:12px;color:var(--accent);font-weight:600;cursor:pointer;margin:0 0 10px;">New to this? What do these mean? &#8964;</p>
         <div id="nsExplainerPanel" style="display:none;margin:0 0 14px;background:#f4f1ea;border-radius:10px;padding:12px;font-size:13px;line-height:1.5;color:var(--muted);">
-          <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟩 Settled</strong> &mdash; your body's "rest and connect" state. Heart calm, breathing easy, feeling safe enough to relax, be curious, or connect with others.</p>
-          <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟥 Fight-Flight</strong> &mdash; your body's alarm system gearing up for action. Heart racing, muscles tense, thoughts speeding up. This isn't just anger or panic &mdash; it also shows up as focused drive, excitement, or determination.</p>
-          <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟦 Freeze</strong> &mdash; your body's shutdown response, when fighting or fleeing doesn't feel possible. Low energy, foggy thinking, feeling distant or numb. It can also show up as deep rest, quiet stillness, or intentionally pulling back to recharge.</p>
+          <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟩 Balanced / Good</strong> &mdash; your body's "rest and connect" state. Heart calm, breathing easy, feeling safe enough to relax, be curious, or connect with others.</p>
+          <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟥 Irritated / Unsettled</strong> &mdash; your body's alarm system gearing up for action. Heart racing, muscles tense, thoughts speeding up. This isn't just anger or panic &mdash; it also shows up as focused drive, excitement, or determination.</p>
+          <p style="margin:0 0 10px;"><strong style="color:var(--text);">🟦 Tired / Low Energy</strong> &mdash; your body's shutdown response, when fighting or fleeing doesn't feel possible. Low energy, foggy thinking, feeling distant or numb. It can also show up as deep rest, quiet stillness, or intentionally pulling back to recharge.</p>
           <p style="margin:0;">There's no wrong answer here &mdash; these are just starting points to help you notice what's going on in your body right now.</p>
           <p id="nsExplainerFoundationsLink" style="margin:10px 0 0;font-weight:600;color:var(--accent);cursor:pointer;">🌱 New to nervous system basics? Learn more in Foundations &rarr;</p>
         </div>
         <div class="ns-buttons">
-          <button class="ns-btn ventral" data-state="ventral">🟩 Settled</button>
-          <button class="ns-btn sympathetic" data-state="sympathetic">🟥 Fight-Flight</button>
-          <button class="ns-btn dorsal" data-state="dorsal">🟦 Freeze</button>
+          <button class="ns-btn ventral" data-state="ventral">🟩 Balanced / Good</button>
+          <button class="ns-btn sympathetic" data-state="sympathetic">🟥 Irritated / Unsettled</button>
+          <button class="ns-btn dorsal" data-state="dorsal">🟦 Tired / Low Energy</button>
         </div>
         <p class="ns-hint" id="nsHint">Notice how you're feeling right now &mdash; there's no wrong answer.</p>
         <p id="anchorLink" style="display:none;font-size:13px;color:var(--accent);font-weight:600;cursor:pointer;margin-top:6px;">⚓ Need something steady? View your anchors</p>
@@ -421,9 +421,9 @@
       <div class="gallery-filters">
         <div class="filter-chip active" data-filter="all">All</div>
         <div class="filter-chip" data-filter="glimmer">Glimmers</div>
-        <div class="filter-chip" data-filter="ventral">🟩 Safe/Connected</div>
-        <div class="filter-chip" data-filter="sympathetic">🟥 Fight/Flight</div>
-        <div class="filter-chip" data-filter="dorsal">🟦 Freeze</div>
+        <div class="filter-chip" data-filter="ventral">🟩 Balanced/Good</div>
+        <div class="filter-chip" data-filter="sympathetic">🟥 Irritated/Unsettled</div>
+        <div class="filter-chip" data-filter="dorsal">🟦 Tired/Low Energy</div>
         <div class="filter-chip" data-filter="deeper">🌊 Deeper reflections</div>
       </div>
       <div class="gallery-grid" id="galleryGrid"></div>
@@ -530,9 +530,9 @@ const GENERAL_PROMPTS = [
 ];
 
 const STATE_PROMPTS = {
-  sympathetic: "Fight-Flight — heart up, thoughts quick, hard to settle, energy with nowhere to go, like water starting to steam. Try photographing something with stillness in motion, or a clear edge or boundary to rest your attention on.",
-  dorsal: "Freeze — distant, foggy, low on energy, like water turning to ice. Look for a bit of warmth or a quiet sign of life nearby — a patch of sun, a plant, something softly alive.",
-  ventral: "Settled — calm, open, connected, moving with ease, like water flowing freely. Capture a moment of connection, play, or ease — whatever is bringing you a little joy right now."
+  sympathetic: "Irritated / Unsettled — heart up, thoughts quick, hard to settle, energy with nowhere to go, like water starting to steam. Try photographing something with stillness in motion, or a clear edge or boundary to rest your attention on.",
+  dorsal: "Tired / Low Energy — distant, foggy, low on energy, like water turning to ice. Look for a bit of warmth or a quiet sign of life nearby — a patch of sun, a plant, something softly alive.",
+  ventral: "Balanced / Good — calm, open, connected, moving with ease, like water flowing freely. Capture a moment of connection, play, or ease — whatever is bringing you a little joy right now."
 };
 
 const GLIMMERS = [
